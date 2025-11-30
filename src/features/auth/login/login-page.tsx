@@ -1,17 +1,28 @@
 "use client";
 
-import { FormEvent, useEffect, useState } from "react";
+import { useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@/store/AuthProvider";
-import { useLogin } from "./use-login";
+import { useLogin, loginSchema } from "./use-login";
+import { TextInput } from "@/components/shared/form/TextInput";
+import { PasswordInput } from "@/components/shared/form/PasswordInput";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { z } from "zod";
 
 export function LoginPage() {
   const router = useRouter();
   const { isAuthenticated } = useAuth();
-  const { mutateAsync, isPending, fieldErrors, formError } = useLogin();
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
+  const { mutateAsync, isPending, formError } = useLogin();
+
+  const form = useForm<z.infer<typeof loginSchema>>({
+    resolver: zodResolver(loginSchema),
+    defaultValues: {
+      email: "",
+      password: "",
+    },
+  });
 
   useEffect(() => {
     if (isAuthenticated) {
@@ -19,9 +30,8 @@ export function LoginPage() {
     }
   }, [isAuthenticated, router]);
 
-  const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
-    event.preventDefault();
-    const result = await mutateAsync({ email, password });
+  const onSubmit = async (values: z.infer<typeof loginSchema>) => {
+    const result = await mutateAsync(values);
     if (result) {
       router.push("/");
     }
@@ -42,43 +52,24 @@ export function LoginPage() {
           </p>
         </div>
 
-        <form className="space-y-4" onSubmit={handleSubmit}>
-          <div className="space-y-2">
-            <label className="text-sm text-slate-200" htmlFor="email">
-              Email
-            </label>
-            <input
-              id="email"
-              type="email"
-              placeholder="you@example.com"
-              value={email}
-              onChange={(event) => setEmail(event.target.value)}
-              className="w-full rounded-lg border border-white/10 bg-white/5 px-3 py-2 text-white outline-none transition focus:border-primary focus:ring-2 focus:ring-primary/30"
-            />
-            {fieldErrors?.email ? (
-              <p className="text-sm text-amber-300" role="alert">
-                {fieldErrors.email[0]}
-              </p>
-            ) : null}
-          </div>
-          <div className="space-y-2">
-            <label className="text-sm text-slate-200" htmlFor="password">
-              Password
-            </label>
-            <input
-              id="password"
-              type="password"
-              placeholder="••••••••"
-              value={password}
-              onChange={(event) => setPassword(event.target.value)}
-              className="w-full rounded-lg border border-white/10 bg-white/5 px-3 py-2 text-white outline-none transition focus:border-primary focus:ring-2 focus:ring-primary/30"
-            />
-            {fieldErrors?.password ? (
-              <p className="text-sm text-amber-300" role="alert">
-                {fieldErrors.password[0]}
-              </p>
-            ) : null}
-          </div>
+        <form className="space-y-4" onSubmit={form.handleSubmit(onSubmit)}>
+          <TextInput
+            label="Email"
+            id="email"
+            type="email"
+            placeholder="you@example.com"
+            autoComplete="email"
+            error={form.formState.errors.email?.message}
+            {...form.register("email")}
+          />
+          <PasswordInput
+            label="Password"
+            id="password"
+            placeholder="••••••••"
+            autoComplete="current-password"
+            error={form.formState.errors.password?.message}
+            {...form.register("password")}
+          />
 
           {formError ? (
             <p className="text-sm text-amber-300" role="alert">

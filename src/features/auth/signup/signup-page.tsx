@@ -1,17 +1,33 @@
 "use client";
 
-import { FormEvent, useEffect, useState } from "react";
+import { useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@/store/AuthProvider";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { z } from "zod";
+import { TextInput } from "@/components/shared/form/TextInput";
+import { PasswordInput } from "@/components/shared/form/PasswordInput";
+
+const signupSchema = z.object({
+  name: z.string().min(2, "Name must be at least 2 characters."),
+  email: z.string().email("Please enter a valid email."),
+  password: z.string().min(6, "Password must be at least 6 characters."),
+});
 
 export function SignupPage() {
   const router = useRouter();
   const { login, isLoading, isAuthenticated } = useAuth();
-  const [name, setName] = useState("");
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
-  const [error, setError] = useState<string | null>(null);
+
+  const form = useForm<z.infer<typeof signupSchema>>({
+    resolver: zodResolver(signupSchema),
+    defaultValues: {
+      name: "",
+      email: "",
+      password: "",
+    },
+  });
 
   useEffect(() => {
     if (isAuthenticated) {
@@ -19,16 +35,8 @@ export function SignupPage() {
     }
   }, [isAuthenticated, router]);
 
-  const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
-    event.preventDefault();
-    setError(null);
-
-    if (!name || !email || !password) {
-      setError("Please fill out all fields.");
-      return;
-    }
-
-    await login({ name, email }, "demo-token");
+  const onSubmit = async (values: z.infer<typeof signupSchema>) => {
+    await login({ name: values.name, email: values.email }, "demo-token");
     router.push("/");
   };
 
@@ -49,52 +57,33 @@ export function SignupPage() {
           </p>
         </div>
 
-        <form className="space-y-4" onSubmit={handleSubmit}>
-          <div className="space-y-2">
-            <label className="text-sm text-slate-200" htmlFor="name">
-              Name
-            </label>
-            <input
-              id="name"
-              type="text"
-              placeholder="Ada Lovelace"
-              value={name}
-              onChange={(event) => setName(event.target.value)}
-              className="w-full rounded-lg border border-white/10 bg-white/5 px-3 py-2 text-white outline-none transition focus:border-primary focus:ring-2 focus:ring-primary/30"
-            />
-          </div>
-          <div className="space-y-2">
-            <label className="text-sm text-slate-200" htmlFor="email">
-              Email
-            </label>
-            <input
-              id="email"
-              type="email"
-              placeholder="you@example.com"
-              value={email}
-              onChange={(event) => setEmail(event.target.value)}
-              className="w-full rounded-lg border border-white/10 bg-white/5 px-3 py-2 text-white outline-none transition focus:border-primary focus:ring-2 focus:ring-primary/30"
-            />
-          </div>
-          <div className="space-y-2">
-            <label className="text-sm text-slate-200" htmlFor="password">
-              Password
-            </label>
-            <input
-              id="password"
-              type="password"
-              placeholder="••••••••"
-              value={password}
-              onChange={(event) => setPassword(event.target.value)}
-              className="w-full rounded-lg border border-white/10 bg-white/5 px-3 py-2 text-white outline-none transition focus:border-primary focus:ring-2 focus:ring-primary/30"
-            />
-          </div>
-
-          {error ? (
-            <p className="text-sm text-amber-300" role="alert">
-              {error}
-            </p>
-          ) : null}
+        <form className="space-y-4" onSubmit={form.handleSubmit(onSubmit)}>
+          <TextInput
+            label="Name"
+            id="name"
+            type="text"
+            placeholder="Ada Lovelace"
+            autoComplete="name"
+            error={form.formState.errors.name?.message}
+            {...form.register("name")}
+          />
+          <TextInput
+            label="Email"
+            id="email"
+            type="email"
+            placeholder="you@example.com"
+            autoComplete="email"
+            error={form.formState.errors.email?.message}
+            {...form.register("email")}
+          />
+          <PasswordInput
+            label="Password"
+            id="password"
+            placeholder="••••••••"
+            autoComplete="new-password"
+            error={form.formState.errors.password?.message}
+            {...form.register("password")}
+          />
 
           <Button
             type="submit"
