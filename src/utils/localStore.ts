@@ -7,7 +7,7 @@ export class LocalStore {
     return typeof window !== "undefined" && typeof localStorage !== "undefined";
   }
 
-  static setItem(key: string, value: any): void {
+  static setItem<T>(key: string, value: T): void {
     if (!this.isBrowser()) return;
 
     try {

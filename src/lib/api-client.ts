@@ -48,10 +48,10 @@ class ApiClient {
     );
   }
 
-  private async request<TResponse>(
+  private async request<TResponse, TBody = unknown>(
     method: string,
     path: string,
-    options: RequestWithBodyOptions<any> = {},
+    options: RequestWithBodyOptions<TBody> = {},
   ): Promise<TResponse> {
     const { headers, body, params, signal } = options;
     const response = await this.client.request<TResponse>({
