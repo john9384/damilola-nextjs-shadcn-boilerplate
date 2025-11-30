@@ -1,4 +1,6 @@
-const ENCRYPTION_KEY = "xanadu-lms-encryption-key";
+import { env } from "./env";
+
+const ENCRYPTION_KEY = env.encryptionKey;
 
 export class LocalStore {
   private static isBrowser(): boolean {
