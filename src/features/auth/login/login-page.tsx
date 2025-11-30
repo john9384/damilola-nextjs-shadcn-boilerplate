@@ -4,13 +4,14 @@ import { FormEvent, useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@/store/AuthProvider";
+import { useLogin } from "./use-login";
 
 export function LoginPage() {
   const router = useRouter();
-  const { login, isLoading, isAuthenticated } = useAuth();
+  const { isAuthenticated } = useAuth();
+  const { mutateAsync, isPending, fieldErrors, formError } = useLogin();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     if (isAuthenticated) {
@@ -20,15 +21,10 @@ export function LoginPage() {
 
   const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
-    setError(null);
-
-    if (!email || !password) {
-      setError("Please enter both email and password.");
-      return;
+    const result = await mutateAsync({ email, password });
+    if (result) {
+      router.push("/");
     }
-
-    await login({ name: email.split("@")[0] || "User", email }, "demo-token");
-    router.push("/"); // Send authenticated users to the dashboard
   };
 
   if (isAuthenticated) return null;
@@ -59,6 +55,11 @@ export function LoginPage() {
               onChange={(event) => setEmail(event.target.value)}
               className="w-full rounded-lg border border-white/10 bg-white/5 px-3 py-2 text-white outline-none transition focus:border-primary focus:ring-2 focus:ring-primary/30"
             />
+            {fieldErrors?.email ? (
+              <p className="text-sm text-amber-300" role="alert">
+                {fieldErrors.email[0]}
+              </p>
+            ) : null}
           </div>
           <div className="space-y-2">
             <label className="text-sm text-slate-200" htmlFor="password">
@@ -72,20 +73,25 @@ export function LoginPage() {
               onChange={(event) => setPassword(event.target.value)}
               className="w-full rounded-lg border border-white/10 bg-white/5 px-3 py-2 text-white outline-none transition focus:border-primary focus:ring-2 focus:ring-primary/30"
             />
+            {fieldErrors?.password ? (
+              <p className="text-sm text-amber-300" role="alert">
+                {fieldErrors.password[0]}
+              </p>
+            ) : null}
           </div>
 
-          {error ? (
+          {formError ? (
             <p className="text-sm text-amber-300" role="alert">
-              {error}
+              {formError}
             </p>
           ) : null}
 
           <Button
             type="submit"
             className="mt-2 w-full bg-primary text-primary-foreground shadow-lg shadow-primary/20"
-            disabled={isLoading}
+            disabled={isPending}
           >
-            {isLoading ? "Signing in..." : "Sign in"}
+            {isPending ? "Signing in..." : "Sign in"}
           </Button>
         </form>
 

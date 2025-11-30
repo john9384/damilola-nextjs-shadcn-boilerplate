@@ -6,33 +6,20 @@ import { Button } from "@/components/ui/button";
 import { useAuth } from "@/store/AuthProvider";
 
 export function DashboardPage() {
-  const router = useRouter();
-  const { user, isAuthenticated, isLoading, logout } = useAuth();
-
-  useEffect(() => {
-    if (!isLoading && !isAuthenticated) {
-      router.replace("/auth/login");
-    }
-  }, [isAuthenticated, isLoading, router]);
-
-  if (!isAuthenticated) return null;
+  const { user, logout } = useAuth();
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-900 via-slate-950 to-black px-6 py-12 text-slate-50">
       <div className="mx-auto flex w-full max-w-4xl flex-col gap-8">
         <header className="flex flex-wrap items-center justify-between gap-4 rounded-2xl border border-white/10 bg-white/5 px-6 py-4 shadow-2xl backdrop-blur">
           <div>
-            <p className="text-sm uppercase tracking-[0.2em] text-slate-300">
-              Dashboard
-            </p>
+            <p className="text-sm uppercase tracking-[0.2em] text-slate-300">Dashboard</p>
             <h1 className="text-3xl font-semibold tracking-tight text-white">
               Welcome back{user?.name ? `, ${user.name}` : ""}!
             </h1>
             <p className="text-sm text-slate-300">Here is your at-a-glance view.</p>
           </div>
-          <Button variant="outline" onClick={logout}>
-            Log out
-          </Button>
+          <Button onClick={logout}>Log out</Button>
         </header>
 
         <div className="grid gap-6 md:grid-cols-3">

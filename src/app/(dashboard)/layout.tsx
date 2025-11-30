@@ -1,33 +1,32 @@
- "use client";
+﻿"use client";
 
 import { useEffect } from "react";
-import { usePathname, useRouter } from "next/navigation";
+import { useRouter } from "next/navigation";
 import { useAuth } from "@/store/AuthProvider";
 
-export default function AuthLayout({
+export default function DashboardLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
   const router = useRouter();
-  const pathname = usePathname();
   const { isAuthenticated, isLoading } = useAuth();
 
   useEffect(() => {
-    if (!isLoading && isAuthenticated) {
-      router.replace("/");
+    if (!isLoading && !isAuthenticated) {
+      router.replace("/auth/login");
     }
-  }, [isAuthenticated, isLoading, router, pathname]);
+  }, [isAuthenticated, isLoading, router]);
 
   if (isLoading) {
     return (
       <div className="flex min-h-screen items-center justify-center bg-slate-950 text-slate-100">
-        Loading...
+        Loading dashboard...
       </div>
     );
   }
 
-  if (isAuthenticated) return null;
+  if (!isAuthenticated) return null;
 
   return children;
 }
