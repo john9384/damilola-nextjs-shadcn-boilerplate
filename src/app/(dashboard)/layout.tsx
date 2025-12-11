@@ -2,13 +2,10 @@
 
 import { useEffect } from "react";
 import { useRouter } from "next/navigation";
+import { MainLayout } from "@/components/layout/MainLayout";
 import { useAuth } from "@/store/AuthProvider";
 
-export default function DashboardLayout({
-  children,
-}: {
-  children: React.ReactNode;
-}) {
+export default function DashboardLayout({ children }: { children: React.ReactNode }) {
   const router = useRouter();
   const { isAuthenticated, isLoading } = useAuth();
 
@@ -20,7 +17,7 @@ export default function DashboardLayout({
 
   if (isLoading) {
     return (
-      <div className="flex min-h-screen items-center justify-center bg-slate-950 text-slate-100">
+      <div className="flex min-h-screen items-center justify-center  text-slate-100">
         Loading dashboard...
       </div>
     );
@@ -28,5 +25,5 @@ export default function DashboardLayout({
 
   if (!isAuthenticated) return null;
 
-  return children;
+  return <MainLayout>{children}</MainLayout>;
 }

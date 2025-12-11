@@ -26,9 +26,9 @@ export const PhoneInput = React.forwardRef<HTMLInputElement, PhoneInputProps>(
     return (
       <div className={cn("space-y-1.5", containerClassName)}>
         {label ? (
-          <label className="block text-sm font-medium text-slate-200">
+          <label className="block text-sm font-medium text-gray-700">
             {label}
-            {required ? <span className="text-rose-300"> *</span> : null}
+            {required ? <span className="text-red-500 ml-0.5">*</span> : null}
           </label>
         ) : null}
         <input
@@ -38,18 +38,18 @@ export const PhoneInput = React.forwardRef<HTMLInputElement, PhoneInputProps>(
           autoComplete="tel"
           required={required}
           className={cn(
-            "w-full rounded-lg border border-white/10 bg-white/5 px-3 py-2 text-white outline-none transition focus:border-primary focus:ring-2 focus:ring-primary/30",
-            error && "border-rose-400/60 focus:border-rose-400 focus:ring-rose-400/30",
+            "w-full rounded-lg border border-gray-300 bg-white px-3 py-2 text-gray-900 outline-none transition-all duration-200 h-12 focus:border-primary focus:ring-2 focus:ring-primary/20",
+            error && "border-red-400 focus:border-red-500 focus:ring-red-400/20",
             className,
           )}
           {...props}
         />
         {error ? (
-          <p className="text-sm text-rose-300" role="alert">
+          <p className="text-sm text-red-600" role="alert">
             {error}
           </p>
         ) : description ? (
-          <p className="text-sm text-slate-400">{description}</p>
+          <p className="text-sm text-gray-500">{description}</p>
         ) : null}
       </div>
     );

@@ -1,6 +1,7 @@
 "use client";
 
 import React, { createContext, useContext, useEffect, useMemo, useState } from "react";
+import { CookieStore } from "../utils/cookieStore";
 import { LocalStore } from "../utils/localStore";
 
 type User = {
@@ -17,7 +18,7 @@ type AuthState = {
   logout: () => void;
 };
 
-const AUTH_STORE_KEY = "xanadu-auth";
+export const AUTH_STORE_KEY = "boilerplate-auth";
 
 const AuthContext = createContext<AuthState | undefined>(undefined);
 
@@ -27,7 +28,10 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
-    const stored = LocalStore.getItem<{ user: User; token: string }>(AUTH_STORE_KEY);
+    const cookieStored = CookieStore.getItem<{ user: User; token: string }>(AUTH_STORE_KEY);
+    const localStored = LocalStore.getItem<{ user: User; token: string }>(AUTH_STORE_KEY);
+    const stored = cookieStored ?? localStored;
+
     if (stored?.user && stored?.token) {
       setUser(stored.user);
       setToken(stored.token);
@@ -40,6 +44,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     setUser(newUser);
     setToken(newToken);
     LocalStore.setItem(AUTH_STORE_KEY, { user: newUser, token: newToken });
+    CookieStore.setItem(AUTH_STORE_KEY, { user: newUser, token: newToken });
     setIsLoading(false);
   };
 
@@ -48,6 +53,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     setUser(null);
     setToken(null);
     LocalStore.removeItem(AUTH_STORE_KEY);
+    CookieStore.removeItem(AUTH_STORE_KEY);
     setIsLoading(false);
   };
 

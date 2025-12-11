@@ -51,7 +51,7 @@
   --card-foreground: #252525;
   --popover: #ffffff;
   --popover-foreground: #252525;
-  --primary: #343434;
+  --primary: #000000;
   --primary-foreground: #fbfbfb;
   --secondary: #f7f7f7;
   --secondary-foreground: #343434;
@@ -118,5 +118,24 @@
   }
   body {
     @apply bg-background text-foreground;
+  }
+
+  :root {
+    scrollbar-color: var(--primary) transparent;
+    scrollbar-width: thin;
+  }
+
+  *::-webkit-scrollbar {
+    width: 10px;
+    height: 10px;
+  }
+
+  *::-webkit-scrollbar-track {
+    background: transparent;
+  }
+
+  *::-webkit-scrollbar-thumb {
+    background-color: var(--primary);
+    border-radius: 9999px;
   }
 }

@@ -1,4 +1,4 @@
-"use client"
+"use client";
 
 import { DashboardPage } from "@/features/dashboard/dashboard-page";
 
