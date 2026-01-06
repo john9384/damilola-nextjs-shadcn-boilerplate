@@ -12,7 +12,7 @@ export function MainLayout({ children }: { children: React.ReactNode }) {
   };
 
   return (
-    <div className="flex h-screen w-full overflow-hidden bg-[#F8F9FA]">
+    <div className="flex h-screen w-full overflow-hidden bg-background">
       <Sidebar isCollapsed={isCollapsed} />
       <main className="flex-1 overflow-y-auto transition-all duration-300 ease-in-out">
         <Topbar onToggle={toggleSidebar} />

@@ -43,16 +43,14 @@ export function SignupPage() {
   if (isAuthenticated) return null;
 
   return (
-    <div className="flex min-h-screen items-center justify-center bg-gradient-to-br from-indigo-900 via-slate-900 to-slate-950 px-4 py-10 text-slate-50">
-      <div className="w-full max-w-md rounded-2xl border border-white/10 bg-white/5 p-8 shadow-2xl backdrop-blur">
+    <div className="flex min-h-screen items-center justify-center bg-background px-4 py-10 text-foreground">
+      <div className="w-full max-w-md rounded-2xl border border-border bg-card p-8 text-card-foreground shadow-2xl">
         <div className="mb-8 space-y-2 text-center">
-          <p className="text-sm uppercase tracking-[0.2em] text-slate-300">
+          <p className="text-sm uppercase tracking-[0.2em] text-muted-foreground">
             Join the workspace
           </p>
-          <h1 className="text-3xl font-semibold tracking-tight text-white">
-            Create your account
-          </h1>
-          <p className="text-sm text-slate-300">
+          <h1 className="text-3xl font-semibold tracking-tight">Create your account</h1>
+          <p className="text-sm text-muted-foreground">
             Set up your profile to access your dashboard.
           </p>
         </div>
@@ -94,7 +92,7 @@ export function SignupPage() {
           </Button>
         </form>
 
-        <p className="mt-6 text-center text-sm text-slate-300">
+        <p className="mt-6 text-center text-sm text-muted-foreground">
           Already have an account?{" "}
           <button
             type="button"

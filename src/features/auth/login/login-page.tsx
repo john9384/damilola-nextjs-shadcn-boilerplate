@@ -40,14 +40,14 @@ export function LoginPage() {
   if (isAuthenticated) return null;
 
   return (
-    <div className="flex min-h-screen items-center justify-center bg-gradient-to-br from-slate-900 via-slate-950 to-black px-4 py-10 text-slate-50">
-      <div className="w-full max-w-md rounded-2xl border border-white/10 bg-white/5 p-8 shadow-2xl backdrop-blur">
+    <div className="flex min-h-screen items-center justify-center bg-background px-4 py-10 text-foreground">
+      <div className="w-full max-w-md rounded-2xl border border-border bg-card p-8 text-card-foreground shadow-2xl">
         <div className="mb-8 space-y-2 text-center">
-          <p className="text-sm uppercase tracking-[0.2em] text-slate-300">
+          <p className="text-sm uppercase tracking-[0.2em] text-muted-foreground">
             Welcome back
           </p>
-          <h1 className="text-3xl font-semibold tracking-tight text-white">Sign in</h1>
-          <p className="text-sm text-slate-300">
+          <h1 className="text-3xl font-semibold tracking-tight">Sign in</h1>
+          <p className="text-sm text-muted-foreground">
             Access the dashboard to manage your workspace.
           </p>
         </div>
@@ -72,7 +72,7 @@ export function LoginPage() {
           />
 
           {formError ? (
-            <p className="text-sm text-amber-300" role="alert">
+            <p className="text-sm text-destructive" role="alert">
               {formError}
             </p>
           ) : null}
@@ -86,7 +86,7 @@ export function LoginPage() {
           </Button>
         </form>
 
-        <p className="mt-6 text-center text-sm text-slate-300">
+        <p className="mt-6 text-center text-sm text-muted-foreground">
           New here?{" "}
           <button
             type="button"
