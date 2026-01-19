@@ -1,6 +1,7 @@
 "use client";
 
 import * as React from "react";
+import { useTranslations } from "next-intl";
 import { cn } from "@/lib/utils";
 import { apiClient } from "@/lib/api-client";
 import { Upload, X, FileText, CheckCircle2 } from "lucide-react";
@@ -47,6 +48,19 @@ export function DocumentUploadInput({
     value && fileName ? { url: value, name: fileName } : null,
   );
   const fileInputRef = React.useRef<HTMLInputElement>(null);
+  const t = useTranslations("upload");
+
+  const formatLabelMap: Record<string, string> = {
+    "application/pdf": "PDF",
+    "application/msword": "DOC",
+    "application/vnd.openxmlformats-officedocument.wordprocessingml.document": "DOCX",
+    "image/jpeg": "JPG",
+    "image/jpg": "JPG",
+    "image/png": "PNG",
+  };
+  const acceptedFormatLabels = acceptedFormats
+    .map((format) => formatLabelMap[format] ?? format.split("/")[1]?.toUpperCase() ?? format)
+    .join(", ");
 
   React.useEffect(() => {
     if (value && fileName) {
@@ -58,10 +72,10 @@ export function DocumentUploadInput({
 
   const validateFile = (file: File): string | null => {
     if (!acceptedFormats.includes(file.type)) {
-      return `Invalid file type. Accepted formats: PDF, DOC, DOCX, JPG, PNG`;
+      return t("document.invalidType", { formats: acceptedFormatLabels });
     }
     if (file.size > maxSizeMB * 1024 * 1024) {
-      return `File size must be less than ${maxSizeMB}MB`;
+      return t("document.maxSize", { max: maxSizeMB });
     }
     return null;
   };
@@ -87,7 +101,7 @@ export function DocumentUploadInput({
       onUpload?.(response.url, file.name);
     } catch (error) {
       console.error("Upload error:", error);
-      setUploadError("Failed to upload document. Please try again.");
+      setUploadError(t("document.uploadFailed"));
     } finally {
       setIsUploading(false);
     }
@@ -157,7 +171,7 @@ export function DocumentUploadInput({
               <CheckCircle2 className="size-4 text-green-600 flex-shrink-0" />
             </div>
             <p className="text-xs text-gray-500 mt-0.5">
-              {getFileExtension(uploadedFile.name)} • Uploaded
+              {t("document.uploadedMeta", { ext: getFileExtension(uploadedFile.name) })}
             </p>
           </div>
           <Button
@@ -198,7 +212,7 @@ export function DocumentUploadInput({
           {isUploading ? (
             <div className="flex flex-col items-center gap-2">
               <div className="size-10 border-4 border-primary border-t-transparent rounded-full animate-spin" />
-              <p className="text-sm text-gray-600">Uploading...</p>
+              <p className="text-sm text-gray-600">{t("document.uploading")}</p>
             </div>
           ) : (
             <div className="flex flex-col items-center gap-2">
@@ -216,10 +230,13 @@ export function DocumentUploadInput({
               </div>
               <div>
                 <p className="text-sm font-medium text-gray-900">
-                  {error || uploadError ? "Upload failed" : "Click to upload or drag and drop"}
+                  {error || uploadError ? t("document.uploadFailedShort") : t("document.prompt")}
                 </p>
                 <p className="text-xs text-gray-500 mt-1">
-                  PDF, DOC, DOCX, JPG, PNG (max {maxSizeMB}MB)
+                  {t("document.supportedFormats", {
+                    formats: acceptedFormatLabels,
+                    max: maxSizeMB,
+                  })}
                 </p>
               </div>
             </div>
@@ -237,4 +254,3 @@ export function DocumentUploadInput({
     </div>
   );
 }
-

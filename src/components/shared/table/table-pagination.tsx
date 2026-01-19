@@ -1,6 +1,7 @@
 "use client";
 
 import { ChevronLeft, ChevronRight } from "lucide-react";
+import { useTranslations } from "next-intl";
 import { Button } from "@/components/ui/button";
 import type { TablePaginationProps } from "@/types/table.types";
 
@@ -14,6 +15,7 @@ export function TablePagination({
   startIndex,
   endIndex,
 }: TablePaginationProps) {
+  const t = useTranslations("table");
   const handlePrevious = () => {
     if (currentPage > 1) {
       onPageChange(currentPage - 1);
@@ -29,7 +31,7 @@ export function TablePagination({
   return (
     <div className="border-t border-gray-200 w-full flex flex-col sm:flex-row items-center justify-between gap-4 pt-4">
       <div className="text-sm text-gray-600">
-        Showing {startIndex} to {endIndex} of {totalItems} items
+        {t("showing", { start: startIndex, end: endIndex, total: totalItems })}
       </div>
 
       <div className="flex items-center gap-2">
@@ -45,7 +47,7 @@ export function TablePagination({
 
         <div className="flex items-center gap-1">
           <span className="text-sm text-gray-700">
-            Page {currentPage} of {totalPages}
+            {t("pageOf", { current: currentPage, total: totalPages })}
           </span>
         </div>
 

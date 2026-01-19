@@ -1,0 +1,100 @@
+{
+  "common": {
+    "appName": "Next Starter",
+    "loading": "Loading..."
+  },
+  "dashboard": {
+    "title": "Dashboard",
+    "loading": "Loading dashboard..."
+  },
+  "sidebar": {
+    "logoAlt": "Kwara Waste Logo",
+    "brandName": "Boilerplate",
+    "brandSubtitle": "Control Panel",
+    "logout": "Log out",
+    "nav": {
+      "dashboard": "Dashboard",
+      "settings": "Settings"
+    }
+  },
+  "topbar": {
+    "current": "Current",
+    "userFallback": "User",
+    "profileSettings": "Profile & Settings",
+    "logout": "Log out"
+  },
+  "auth": {
+    "userFallback": "User",
+    "login": {
+      "welcomeBack": "Welcome back",
+      "title": "Sign in",
+      "subtitle": "Access the dashboard to manage your workspace.",
+      "emailLabel": "Email",
+      "emailPlaceholder": "you@example.com",
+      "passwordLabel": "Password",
+      "passwordPlaceholder": "••••••••",
+      "submit": "Sign in",
+      "submitting": "Signing in...",
+      "newHere": "New here?",
+      "createAccount": "Create an account"
+    },
+    "signup": {
+      "joinWorkspace": "Join the workspace",
+      "title": "Create your account",
+      "subtitle": "Set up your profile to access your dashboard.",
+      "nameLabel": "Name",
+      "namePlaceholder": "Ada Lovelace",
+      "emailLabel": "Email",
+      "emailPlaceholder": "you@example.com",
+      "passwordLabel": "Password",
+      "passwordPlaceholder": "••••••••",
+      "submit": "Create account",
+      "submitting": "Creating account...",
+      "alreadyHaveAccount": "Already have an account?",
+      "signIn": "Sign in"
+    },
+    "errors": {
+      "invalidEmail": "Please enter a valid email.",
+      "passwordMin": "Password must be at least 6 characters.",
+      "nameMin": "Name must be at least 2 characters.",
+      "generic": "Something went wrong. Please try again."
+    }
+  },
+  "table": {
+    "searchPlaceholder": "Search",
+    "clearSearch": "Clear search",
+    "filter": "Filter",
+    "sort": "Sort",
+    "showing": "Showing {start} to {end} of {total} items",
+    "pageOf": "Page {current} of {total}"
+  },
+  "upload": {
+    "document": {
+      "invalidType": "Invalid file type. Accepted formats: {formats}",
+      "maxSize": "File size must be less than {max}MB",
+      "uploadFailed": "Failed to upload document. Please try again.",
+      "uploadFailedShort": "Upload failed",
+      "prompt": "Click to upload or drag and drop",
+      "supportedFormats": "{formats} (max {max}MB)",
+      "uploading": "Uploading...",
+      "uploadedMeta": "{ext} • Uploaded"
+    },
+    "image": {
+      "invalidType": "Invalid file type. Accepted formats: {formats}",
+      "maxSize": "File size must be less than {max}MB",
+      "uploadFailed": "Failed to upload image. Please try again.",
+      "uploadFailedShort": "Upload failed",
+      "prompt": "Click to upload or drag and drop",
+      "supportedFormats": "{formats} (max {max}MB)",
+      "uploading": "Uploading...",
+      "remove": "Remove",
+      "previewAlt": "Preview"
+    }
+  },
+  "form": {
+    "password": {
+      "show": "Show password",
+      "hide": "Hide password"
+    }
+  }
+}

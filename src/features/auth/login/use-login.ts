@@ -1,18 +1,22 @@
 "use client";
 
 import { useMutation } from "@tanstack/react-query";
+import { useTranslations } from "next-intl";
 import { z, ZodError } from "zod";
 import { useAuth } from "@/store/AuthProvider";
 
-export const loginSchema = z.object({
-  email: z.string().email("Please enter a valid email."),
-  password: z.string().min(6, "Password must be at least 6 characters."),
-});
+export const getLoginSchema = (t: (key: string) => string) =>
+  z.object({
+    email: z.string().email(t("errors.invalidEmail")),
+    password: z.string().min(6, t("errors.passwordMin")),
+  });
 
-type LoginInput = z.infer<typeof loginSchema>;
+type LoginInput = z.infer<ReturnType<typeof getLoginSchema>>;
 
 export function useLogin() {
   const { login } = useAuth();
+  const t = useTranslations("auth");
+  const loginSchema = getLoginSchema(t);
 
   const mutation = useMutation({
     mutationFn: async (values: LoginInput) => {
@@ -23,7 +27,7 @@ export function useLogin() {
 
       const { email } = parsed;
       const user = {
-        name: email.split("@")[0] || "User",
+        name: email.split("@")[0] || t("userFallback"),
         email,
       };
       const token = "demo-token";
@@ -35,7 +39,7 @@ export function useLogin() {
 
   const formError =
     mutation.error && !(mutation.error instanceof ZodError)
-      ? "Something went wrong. Please try again."
+      ? t("errors.generic")
       : null;
 
   return {

@@ -3,6 +3,7 @@
 import * as React from "react";
 import { cn } from "@/lib/utils";
 import { Eye, EyeOff } from "lucide-react";
+import { useTranslations } from "next-intl";
 
 type PasswordInputProps = React.InputHTMLAttributes<HTMLInputElement> & {
   label?: string;
@@ -28,6 +29,7 @@ export const PasswordInput = React.forwardRef<HTMLInputElement, PasswordInputPro
     },
     ref,
   ) => {
+    const t = useTranslations("form");
     const [show, setShow] = React.useState(false);
     const [isFocused, setIsFocused] = React.useState(false);
     const inputRef = React.useRef<HTMLInputElement>(null);
@@ -110,7 +112,7 @@ export const PasswordInput = React.forwardRef<HTMLInputElement, PasswordInputPro
               type="button"
               onClick={() => setShow((prev) => !prev)}
               className="text-gray-400 hover:text-gray-600 transition-colors z-20"
-              aria-label={show ? "Hide password" : "Show password"}
+              aria-label={show ? t("password.hide") : t("password.show")}
             >
               {show ? <EyeOff className="size-5" /> : <Eye className="size-5" />}
             </button>

@@ -1,6 +1,7 @@
 "use client";
 
 import * as React from "react";
+import { useTranslations } from "next-intl";
 import { cn } from "@/lib/utils";
 import { apiClient } from "@/lib/api-client";
 import { Upload, X } from "lucide-react";
@@ -36,6 +37,7 @@ export function ImageUpload({
   const [uploadError, setUploadError] = React.useState<string | null>(null);
   const [preview, setPreview] = React.useState<string | null>(value || null);
   const fileInputRef = React.useRef<HTMLInputElement>(null);
+  const t = useTranslations("upload");
 
   React.useEffect(() => {
     setPreview(value || null);
@@ -43,10 +45,10 @@ export function ImageUpload({
 
   const validateFile = (file: File): string | null => {
     if (!acceptedFormats.includes(file.type)) {
-      return `Invalid file type. Accepted formats: ${acceptedFormats.join(", ")}`;
+      return t("image.invalidType", { formats: acceptedFormats.join(", ") });
     }
     if (file.size > maxSizeMB * 1024 * 1024) {
-      return `File size must be less than ${maxSizeMB}MB`;
+      return t("image.maxSize", { max: maxSizeMB });
     }
     return null;
   };
@@ -71,7 +73,7 @@ export function ImageUpload({
       onUpload?.(response.url);
     } catch (error) {
       console.error("Upload error:", error);
-      setUploadError("Failed to upload image. Please try again.");
+      setUploadError(t("image.uploadFailed"));
     } finally {
       setIsUploading(false);
     }
@@ -131,7 +133,7 @@ export function ImageUpload({
           <div className="relative w-full h-48 rounded-lg border-2 border-gray-300 overflow-hidden bg-gray-50">
             <img
               src={preview}
-              alt="Preview"
+              alt={t("image.previewAlt")}
               className="w-full h-full object-cover"
             />
             <div className="absolute inset-0 bg-black/0 group-hover:bg-black/20 transition-colors flex items-center justify-center">
@@ -143,7 +145,7 @@ export function ImageUpload({
                 className="opacity-0 group-hover:opacity-100 transition-opacity"
               >
                 <X className="size-4 mr-2" />
-                Remove
+                {t("image.remove")}
               </Button>
             </div>
           </div>
@@ -176,7 +178,7 @@ export function ImageUpload({
           {isUploading ? (
             <div className="flex flex-col items-center gap-2">
               <div className="size-12 border-4 border-primary border-t-transparent rounded-full animate-spin" />
-              <p className="text-sm text-gray-600">Uploading...</p>
+              <p className="text-sm text-gray-600">{t("image.uploading")}</p>
             </div>
           ) : (
             <div className="flex flex-col items-center gap-2">
@@ -194,11 +196,16 @@ export function ImageUpload({
               </div>
               <div>
                 <p className="text-sm font-medium text-gray-900">
-                  {error || uploadError ? "Upload failed" : "Click to upload or drag and drop"}
+                  {error || uploadError ? t("image.uploadFailedShort") : t("image.prompt")}
                 </p>
                 <p className="text-xs text-gray-500 mt-1">
-                  {acceptedFormats.map((f) => f.split("/")[1]).join(", ").toUpperCase()} (max{" "}
-                  {maxSizeMB}MB)
+                  {t("image.supportedFormats", {
+                    formats: acceptedFormats
+                      .map((f) => f.split("/")[1])
+                      .join(", ")
+                      .toUpperCase(),
+                    max: maxSizeMB,
+                  })}
                 </p>
               </div>
             </div>
@@ -216,4 +223,3 @@ export function ImageUpload({
     </div>
   );
 }
-

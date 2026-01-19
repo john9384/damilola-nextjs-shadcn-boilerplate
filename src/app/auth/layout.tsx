@@ -2,6 +2,7 @@
 
 import { useEffect } from "react";
 import { usePathname, useRouter } from "next/navigation";
+import { useTranslations } from "next-intl";
 import { useAuth } from "@/store/AuthProvider";
 
 export default function AuthLayout({
@@ -11,6 +12,7 @@ export default function AuthLayout({
 }) {
   const router = useRouter();
   const pathname = usePathname();
+  const t = useTranslations("common");
   const { isAuthenticated, isLoading } = useAuth();
 
   useEffect(() => {
@@ -22,7 +24,7 @@ export default function AuthLayout({
   if (isLoading) {
     return (
       <div className="flex min-h-screen items-center justify-center bg-background text-foreground">
-        Loading...
+        {t("loading")}
       </div>
     );
   }

@@ -1,0 +1,100 @@
+{
+  "common": {
+    "appName": "Next Starter",
+    "loading": "Cargando..."
+  },
+  "dashboard": {
+    "title": "Panel",
+    "loading": "Cargando panel..."
+  },
+  "sidebar": {
+    "logoAlt": "Logotipo de Kwara Waste",
+    "brandName": "Boilerplate",
+    "brandSubtitle": "Panel de control",
+    "logout": "Cerrar sesión",
+    "nav": {
+      "dashboard": "Panel",
+      "settings": "Configuración"
+    }
+  },
+  "topbar": {
+    "current": "Actual",
+    "userFallback": "Usuario",
+    "profileSettings": "Perfil y configuración",
+    "logout": "Cerrar sesión"
+  },
+  "auth": {
+    "userFallback": "Usuario",
+    "login": {
+      "welcomeBack": "Bienvenido de nuevo",
+      "title": "Iniciar sesión",
+      "subtitle": "Accede al panel para administrar tu espacio de trabajo.",
+      "emailLabel": "Correo electrónico",
+      "emailPlaceholder": "tu@ejemplo.com",
+      "passwordLabel": "Contraseña",
+      "passwordPlaceholder": "••••••••",
+      "submit": "Iniciar sesión",
+      "submitting": "Iniciando sesión...",
+      "newHere": "¿Eres nuevo?",
+      "createAccount": "Crear una cuenta"
+    },
+    "signup": {
+      "joinWorkspace": "Únete al espacio de trabajo",
+      "title": "Crea tu cuenta",
+      "subtitle": "Configura tu perfil para acceder a tu panel.",
+      "nameLabel": "Nombre",
+      "namePlaceholder": "Ada Lovelace",
+      "emailLabel": "Correo electrónico",
+      "emailPlaceholder": "tu@ejemplo.com",
+      "passwordLabel": "Contraseña",
+      "passwordPlaceholder": "••••••••",
+      "submit": "Crear cuenta",
+      "submitting": "Creando cuenta...",
+      "alreadyHaveAccount": "¿Ya tienes una cuenta?",
+      "signIn": "Iniciar sesión"
+    },
+    "errors": {
+      "invalidEmail": "Introduce un correo electrónico válido.",
+      "passwordMin": "La contraseña debe tener al menos 6 caracteres.",
+      "nameMin": "El nombre debe tener al menos 2 caracteres.",
+      "generic": "Algo salió mal. Inténtalo de nuevo."
+    }
+  },
+  "table": {
+    "searchPlaceholder": "Buscar",
+    "clearSearch": "Borrar búsqueda",
+    "filter": "Filtrar",
+    "sort": "Ordenar",
+    "showing": "Mostrando {start} a {end} de {total} elementos",
+    "pageOf": "Página {current} de {total}"
+  },
+  "upload": {
+    "document": {
+      "invalidType": "Tipo de archivo no válido. Formatos aceptados: {formats}",
+      "maxSize": "El tamaño del archivo debe ser menor que {max}MB",
+      "uploadFailed": "No se pudo subir el documento. Inténtalo de nuevo.",
+      "uploadFailedShort": "Error al subir",
+      "prompt": "Haz clic para subir o arrastra y suelta",
+      "supportedFormats": "{formats} (máx {max}MB)",
+      "uploading": "Subiendo...",
+      "uploadedMeta": "{ext} • Subido"
+    },
+    "image": {
+      "invalidType": "Tipo de archivo no válido. Formatos aceptados: {formats}",
+      "maxSize": "El tamaño del archivo debe ser menor que {max}MB",
+      "uploadFailed": "No se pudo subir la imagen. Inténtalo de nuevo.",
+      "uploadFailedShort": "Error al subir",
+      "prompt": "Haz clic para subir o arrastra y suelta",
+      "supportedFormats": "{formats} (máx {max}MB)",
+      "uploading": "Subiendo...",
+      "remove": "Eliminar",
+      "previewAlt": "Vista previa"
+    }
+  },
+  "form": {
+    "password": {
+      "show": "Mostrar contraseña",
+      "hide": "Ocultar contraseña"
+    }
+  }
+}

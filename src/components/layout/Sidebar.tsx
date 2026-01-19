@@ -7,16 +7,17 @@ import { LayoutDashboard, LogOut, Menu, Settings, X } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import { useTranslations } from "next-intl";
 import { useState } from "react";
 
 const navigation = [
   {
-    name: "Dashboard",
+    key: "dashboard",
     href: "/",
     icon: LayoutDashboard,
   },
   {
-    name: "Settings",
+    key: "settings",
     href: "/settings",
     icon: Settings,
   },
@@ -30,6 +31,7 @@ export function Sidebar({ isCollapsed }: SidebarProps) {
   const [isMobileOpen, setIsMobileOpen] = useState(false);
   const pathname = usePathname();
   const { logout } = useAuth();
+  const t = useTranslations("sidebar");
 
   const toggleMobile = () => {
     setIsMobileOpen(!isMobileOpen);
@@ -56,7 +58,7 @@ export function Sidebar({ isCollapsed }: SidebarProps) {
               <div className="flex size-8 items-center justify-center rounded-md bg-white p-1">
                 <Image
                   src="/logo.svg"
-                  alt="Kwara Waste Logo"
+                  alt={t("logoAlt")}
                   width={32}
                   height={32}
                   className="w-full h-full object-contain"
@@ -64,8 +66,8 @@ export function Sidebar({ isCollapsed }: SidebarProps) {
               </div>
               {!isCollapsed && (
                 <div className="flex flex-col">
-                  <span className="text-sm font-semibold text-white">Boilerplate</span>
-                  <span className="text-xs text-white/70">Control Panel</span>
+                  <span className="text-sm font-semibold text-white">{t("brandName")}</span>
+                  <span className="text-xs text-white/70">{t("brandSubtitle")}</span>
                 </div>
               )}
             </div>
@@ -96,7 +98,7 @@ export function Sidebar({ isCollapsed }: SidebarProps) {
                     )}
                   />
                   {!isCollapsed && (
-                    <span className="transition-opacity duration-200">{item.name}</span>
+                    <span className="transition-opacity duration-200">{t(`nav.${item.key}`)}</span>
                   )}
                   {isActive && !isCollapsed && (
                     <span className="ml-auto size-2 rounded-full bg-white/80 transition-all duration-200" />
@@ -117,7 +119,7 @@ export function Sidebar({ isCollapsed }: SidebarProps) {
               onClick={logout}
             >
               <LogOut className="size-4 shrink-0 transition-transform duration-200 group-hover:scale-110" />
-              {!isCollapsed && <span>Log out</span>}
+              {!isCollapsed && <span>{t("logout")}</span>}
             </Button>
           </div>
         </div>
