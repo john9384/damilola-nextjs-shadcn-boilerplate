@@ -3,7 +3,6 @@
 import { TableSearchBar } from "./table-search-bar";
 import { TableSortButton } from "./table-sort-button";
 import { TableFilterButton } from "./table-filter-button";
-import { useTranslations } from "next-intl";
 
 export interface TableHeaderProps {
   searchValue: string;
@@ -26,8 +25,7 @@ export function TableHeader({
   filterCount = 0,
   searchPlaceholder,
 }: TableHeaderProps) {
-  const t = useTranslations("table");
-  const placeholderText = searchPlaceholder ?? t("searchPlaceholder");
+  const placeholderText = searchPlaceholder ?? "Search";
   return (
     <div className="flex flex-col md:flex-row gap-4 items-start md:items-center">
       <div className="flex-1 w-full flex items-center  justify-between gap-2">

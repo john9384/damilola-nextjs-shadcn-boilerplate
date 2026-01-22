@@ -1,49 +1,76 @@
-"use client";
+import React from "react";
+import { Textarea } from "@/components/ui/textarea";
 
-import * as React from "react";
 import { cn } from "@/lib/utils";
+import { Label } from "@/components/ui/label";
+import { Scalar } from "@/types/global";
 
-type TextAreaInputProps = React.TextareaHTMLAttributes<HTMLTextAreaElement> & {
-  label?: string;
-  description?: string;
-  error?: string;
-  containerClassName?: string;
-};
+export interface InputProps extends React.InputHTMLAttributes<HTMLInputElement> {
+  [key: string]: Scalar;
+}
 
-export const TextAreaInput = React.forwardRef<HTMLTextAreaElement, TextAreaInputProps>(
-  (
-    { label, description, error, className, containerClassName, required, rows = 4, ...props },
-    ref,
-  ) => {
+export const FloatingTextArea = React.forwardRef<HTMLTextAreaElement, InputProps>(
+  ({ className, ...props }, ref) => {
     return (
-      <div className={cn("space-y-1.5", containerClassName)}>
-        {label ? (
-          <label className="block text-sm font-medium text-gray-700">
-            {label}
-            {required ? <span className="text-red-500 ml-0.5">*</span> : null}
-          </label>
-        ) : null}
-        <textarea
-          ref={ref}
-          required={required}
-          rows={rows}
-          className={cn(
-            "w-full rounded-lg border border-gray-300 bg-white px-3 py-2 text-gray-900 outline-none transition-all duration-200 focus:border-primary focus:ring-2 focus:ring-primary/20",
-            "min-h-14",
-            error && "border-red-400 focus:border-red-500 focus:ring-red-400/20",
-            className,
-          )}
-          {...props}
-        />
-        {error ? (
-          <p className="text-sm text-red-600" role="alert">
-            {error}
-          </p>
-        ) : description ? (
-          <p className="text-sm text-gray-500">{description}</p>
-        ) : null}
-      </div>
+      <Textarea
+        placeholder=" "
+        className={cn(
+          "peer rounded-[10px] text-[#212121] placeholder:text-[#C8C8C8] focus-visible:ring-1 focus-visible:ring-ring min-h-[96px]",
+          className,
+        )}
+        ref={ref}
+        {...props}
+      />
     );
   },
 );
+
+FloatingTextArea.displayName = "FloatingTextArea";
+
+export const FloatingLabel = React.forwardRef<
+  React.ElementRef<typeof Label>,
+  React.ComponentPropsWithoutRef<typeof Label>
+>(({ className, ...props }, ref) => {
+  return (
+    <Label
+      className={cn(
+        "peer-focus:secondary peer-focus:dark:secondary absolute start-2 top-2 z-10 origin-[0] -translate-y-4 scale-75 transform bg-background px-2 text-sm text-gray-500 duration-300 " +
+          "peer-placeholder-shown:top-[10px] peer-placeholder-shown:translate-y-0 peer-placeholder-shown:scale-100 " +
+          "peer-focus:top-2 peer-focus:-translate-y-4 peer-focus:scale-75 peer-focus:px-2 dark:bg-background rtl:peer-focus:left-auto rtl:peer-focus:translate-x-1/4 cursor-text",
+        className,
+      )}
+      ref={ref}
+      {...props}
+    />
+  );
+});
+
+FloatingLabel.displayName = "FloatingLabel";
+
+type FloatingLabelInputProps = InputProps & { label?: string };
+
+const TextAreaInput = React.forwardRef<
+  React.ElementRef<typeof FloatingTextArea>,
+  React.PropsWithoutRef<FloatingLabelInputProps>
+>(({ label, error, ...props }, ref) => {
+  return (
+    <div className="relative w-full">
+      <FloatingTextArea
+        ref={ref}
+        id={label}
+        {...props}
+        className={`${error ? "border-red-500 focus-visible:ring-red-500" : ""}`}
+      />
+      <FloatingLabel htmlFor={label}>{label}</FloatingLabel>
+      {error && (
+        <span className="text-[10px] text-red-500 absolute top-[100%] bottom-[1px] pl-1">
+          {error}
+        </span>
+      )}
+    </div>
+  );
+});
+
 TextAreaInput.displayName = "TextAreaInput";
+
+export { TextAreaInput };

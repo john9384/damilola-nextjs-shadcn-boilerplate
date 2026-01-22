@@ -1,7 +1,6 @@
 "use client";
 
 import { ArrowUpDown } from "lucide-react";
-import { useTranslations } from "next-intl";
 import { cn } from "@/lib/utils";
 
 export interface TableSortButtonProps {
@@ -11,7 +10,6 @@ export interface TableSortButtonProps {
 }
 
 export function TableSortButton({ isActive = false, onClick, className }: TableSortButtonProps) {
-  const t = useTranslations("table");
   return (
     <button
       onClick={onClick}
@@ -22,7 +20,7 @@ export function TableSortButton({ isActive = false, onClick, className }: TableS
           : "border-gray-300 bg-white text-gray-600 hover:bg-gray-50",
         className,
       )}
-      title={t("sort")}
+      title="Sort"
       type="button"
     >
       <ArrowUpDown className="size-5" />

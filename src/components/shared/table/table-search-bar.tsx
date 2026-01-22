@@ -1,7 +1,6 @@
 "use client";
 
 import { Search, X } from "lucide-react";
-import { useTranslations } from "next-intl";
 
 export interface TableSearchBarProps {
   value: string;
@@ -16,8 +15,7 @@ export function TableSearchBar({
   placeholder,
   onClear,
 }: TableSearchBarProps) {
-  const t = useTranslations("table");
-  const placeholderText = placeholder ?? t("searchPlaceholder");
+  const placeholderText = placeholder ?? "Search";
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     onChange(e.target.value);
   };
@@ -41,7 +39,7 @@ export function TableSearchBar({
           onClick={handleClear}
           className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 z-10"
           type="button"
-          aria-label={t("clearSearch")}
+          aria-label="Clear search"
         >
           <X className="size-4" />
         </button>

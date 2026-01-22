@@ -1,7 +1,6 @@
 "use client";
 
 import { Filter } from "lucide-react";
-import { useTranslations } from "next-intl";
 import { cn } from "@/lib/utils";
 
 export interface TableFilterButtonProps {
@@ -17,7 +16,6 @@ export function TableFilterButton({
   activeFilterCount = 0,
   className,
 }: TableFilterButtonProps) {
-  const t = useTranslations("table");
   return (
     <button
       onClick={onClick}
@@ -28,7 +26,7 @@ export function TableFilterButton({
           : "border-gray-300 bg-white text-gray-600 hover:bg-gray-50",
         className,
       )}
-      title={t("filter")}
+      title="Filter"
       type="button"
     >
       <Filter className="size-5" />

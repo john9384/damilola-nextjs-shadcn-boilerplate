@@ -1,0 +1,96 @@
+.wrapper {
+  height: 64px;
+  position: relative;
+  width: 100%;
+}
+
+.input {
+  border: 1px solid #ccc;
+  outline: 0;
+  height: 100%;
+  border-radius: 20px;
+  box-sizing: border-box;
+  color: #666;
+  transition: all 0.3s;
+  font-size: 1.5rem;
+  padding: 1.2rem 1.6rem 0;
+  width: 100%;
+}
+
+.input::-webkit-input-placeholder,
+.input:-moz-placeholder,
+.input:-ms-input-placeholder {
+  color: #ccc;
+}
+
+.input:focus ~ .label,
+.input:not(:placeholder-shown) ~ .label {
+  padding: 5px 0px;
+  transform: translateY(-100%) scale(0.75);
+}
+
+.input:not(:placeholder-shown) ~ .label {
+  color: #ccc;
+}
+
+.input:focus ~ .label {
+  color: #ccc;
+}
+
+.input:focus,
+.input:active {
+  border: 1px solid #007bff;
+}
+
+.input.error {
+  border: 1px solid #dc3545;
+}
+
+.input::-webkit-outer-spin-button,
+.input::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+input[type='number'] {
+  -moz-appearance: textfield;
+  appearance: textfield;
+}
+
+.input-icon {
+  position: absolute;
+  right: 12px;
+  top: 0;
+  transform: translateY(80%);
+  width: 24px;
+  height: 24px;
+  cursor: pointer;
+}
+
+.input-icon i {
+  width: 20px;
+  height: 20px;
+}
+
+.label {
+  color: #ccc;
+  font-family: 'Aeonik';
+  left: 1.6rem;
+  line-height: 14px;
+  pointer-events: none;
+  position: absolute;
+  transform-origin: 0 50%;
+  top: 50%;
+  transform: translateY(-50%);
+  transition: transform 0.5s;
+  font-size: 1.4rem;
+}
+
+.error-wrapper {
+  padding-left: 5px;
+}
+
+.error-text {
+  color: #dc3545;
+  font-size: 1.4rem;
+}

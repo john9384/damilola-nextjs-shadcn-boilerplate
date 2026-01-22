@@ -1,7 +1,6 @@
 "use client";
 
 import * as React from "react";
-import { useTranslations } from "next-intl";
 import { cn } from "@/lib/utils";
 import { apiClient } from "@/lib/api-client";
 import { Upload, X, FileText, CheckCircle2 } from "lucide-react";
@@ -48,8 +47,6 @@ export function DocumentUploadInput({
     value && fileName ? { url: value, name: fileName } : null,
   );
   const fileInputRef = React.useRef<HTMLInputElement>(null);
-  const t = useTranslations("upload");
-
   const formatLabelMap: Record<string, string> = {
     "application/pdf": "PDF",
     "application/msword": "DOC",
@@ -72,10 +69,10 @@ export function DocumentUploadInput({
 
   const validateFile = (file: File): string | null => {
     if (!acceptedFormats.includes(file.type)) {
-      return t("document.invalidType", { formats: acceptedFormatLabels });
+      return `Invalid file type. Accepted formats: ${acceptedFormatLabels}`;
     }
     if (file.size > maxSizeMB * 1024 * 1024) {
-      return t("document.maxSize", { max: maxSizeMB });
+      return `File size must be less than ${maxSizeMB}MB`;
     }
     return null;
   };
@@ -101,7 +98,7 @@ export function DocumentUploadInput({
       onUpload?.(response.url, file.name);
     } catch (error) {
       console.error("Upload error:", error);
-      setUploadError(t("document.uploadFailed"));
+      setUploadError("Failed to upload document. Please try again.");
     } finally {
       setIsUploading(false);
     }
@@ -171,7 +168,7 @@ export function DocumentUploadInput({
               <CheckCircle2 className="size-4 text-green-600 flex-shrink-0" />
             </div>
             <p className="text-xs text-gray-500 mt-0.5">
-              {t("document.uploadedMeta", { ext: getFileExtension(uploadedFile.name) })}
+              {`${getFileExtension(uploadedFile.name)} • Uploaded`}
             </p>
           </div>
           <Button
@@ -212,7 +209,7 @@ export function DocumentUploadInput({
           {isUploading ? (
             <div className="flex flex-col items-center gap-2">
               <div className="size-10 border-4 border-primary border-t-transparent rounded-full animate-spin" />
-              <p className="text-sm text-gray-600">{t("document.uploading")}</p>
+              <p className="text-sm text-gray-600">Uploading...</p>
             </div>
           ) : (
             <div className="flex flex-col items-center gap-2">
@@ -230,13 +227,10 @@ export function DocumentUploadInput({
               </div>
               <div>
                 <p className="text-sm font-medium text-gray-900">
-                  {error || uploadError ? t("document.uploadFailedShort") : t("document.prompt")}
+                  {error || uploadError ? "Upload failed" : "Click to upload or drag and drop"}
                 </p>
                 <p className="text-xs text-gray-500 mt-1">
-                  {t("document.supportedFormats", {
-                    formats: acceptedFormatLabels,
-                    max: maxSizeMB,
-                  })}
+                  {`${acceptedFormatLabels} (max ${maxSizeMB}MB)`}
                 </p>
               </div>
             </div>
