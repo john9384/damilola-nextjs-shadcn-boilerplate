@@ -1,58 +1,177 @@
 import * as React from "react";
 import { format } from "date-fns";
-import { Calendar as CalendarIcon } from "lucide-react";
+import { CalendarIcon, Clock } from "lucide-react";
 
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { Calendar } from "@/components/ui/calendar";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
-import { FloatingLabel } from "./TextInput";
-import type { Scalar } from "@/types/global";
+import { Input } from "@/components/ui/input.tsx";
+import { Label } from "@/components/ui/label.tsx";
+import { Scalars } from "@/types/global.types";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 
-export interface DatePickerProps {
-  value?: Date;
-  onChange: (date?: Date) => void;
-  label?: string;
+interface DateInputProps extends React.ComponentPropsWithRef<typeof Input> {
+  label: string;
   error?: string;
-  [key: string]: Scalar;
+  placeholder?: string;
+  value?: Scalars;
+  onChange?: (value: Scalars) => void;
+  className?: string;
+  selectTime?: boolean;
+
+  [key: string]: Scalars;
 }
 
-const DateInput = React.forwardRef<
-  React.ElementRef<typeof Button>,
-  React.PropsWithoutRef<DatePickerProps>
->(({ id, label, error, value, onChange, ...props }, ref) => {
+export function DateInput(props: DateInputProps) {
+  const { label, id, className, error, placeholder, value, onChange, selectTime = false } = props;
+  const inputId = id || label.toLowerCase().replace(/\s+/g, "-");
+
+  // Initialize time from value if it exists and selectTime is true, otherwise use current time
+  const getInitialTime = React.useCallback(() => {
+    if (value && selectTime) {
+      const date = new Date(value);
+      return {
+        hours: date.getHours().toString().padStart(2, "0"),
+        minutes: date.getMinutes().toString().padStart(2, "0"),
+      };
+    }
+    if (selectTime) {
+      const now = new Date();
+      return {
+        hours: now.getHours().toString().padStart(2, "0"),
+        minutes: now.getMinutes().toString().padStart(2, "0"),
+      };
+    }
+    return {
+      hours: "00",
+      minutes: "00",
+    };
+  }, [value, selectTime]);
+
+  const [selectedTime, setSelectedTime] = React.useState(getInitialTime);
+
+  // Update time when value changes
+  React.useEffect(() => {
+    setSelectedTime(getInitialTime());
+  }, [getInitialTime]);
+
+  const handleDateChange = (date: Date | undefined) => {
+    if (!date) {
+      onChange?.(undefined);
+      return;
+    }
+
+    if (selectTime) {
+      // Combine selected date with selected time
+      const newDate = new Date(date);
+      newDate.setHours(parseInt(selectedTime.hours), parseInt(selectedTime.minutes), 0, 0);
+      onChange?.(newDate);
+    } else {
+      // For date-only selection, set time to start of day
+      const newDate = new Date(date);
+      newDate.setHours(0, 0, 0, 0);
+      onChange?.(newDate);
+    }
+  };
+
+  const handleTimeChange = (type: "hours" | "minutes", timeValue: string) => {
+    const newTime = { ...selectedTime, [type]: timeValue };
+    setSelectedTime(newTime);
+
+    if (value) {
+      const currentDate = new Date(value);
+      currentDate.setHours(parseInt(newTime.hours), parseInt(newTime.minutes), 0, 0);
+      onChange?.(currentDate);
+    }
+  };
+
+  const formatDisplayValue = (val: Date) => {
+    if (selectTime) {
+      return format(val, "PPP HH:mm");
+    }
+    return format(val, "PPP");
+  };
+
+  // Generate hours and minutes options
+  const hours = Array.from({ length: 24 }, (_, i) => i.toString().padStart(2, "0"));
+  const minutes = Array.from({ length: 60 }, (_, i) => i.toString().padStart(2, "0"));
+
   return (
-    <div className="relative h-14">
+    <div className={cn("flex flex-col gap-1 w-full", className)}>
+      <Label htmlFor={inputId} className="ml-1">
+        {label}
+      </Label>
       <Popover>
-        <PopoverTrigger asChild>
+        <PopoverTrigger asChild className="bg-transparent">
           <Button
-            ref={ref}
             variant={"outline"}
             className={cn(
-              "w-full justify-start text-left font-normal h-full border-gray-200",
+              "w-full h-14 justify-start text-left font-normal hover:bg-transparent hover:text-foreground",
               !value && "text-muted-foreground",
-              error ? "border-red-500" : "",
             )}
-            {...props}
           >
             <CalendarIcon className="mr-2 h-4 w-4" />
-            {value ? format(value, "PPP") : <span>{label}</span>}
+            {value ? formatDisplayValue(value) : <span>{placeholder}</span>}
           </Button>
         </PopoverTrigger>
         <PopoverContent className="w-auto p-0">
-          <Calendar mode="single" selected={value} onSelect={onChange} captionLayout="dropdown" />
+          <div className="p-3">
+            <Calendar mode="single" selected={value} onSelect={handleDateChange} initialFocus />
+
+            {selectTime && (
+              <div className="mt-4 pt-4 border-t">
+                <div className="flex items-center gap-2 mb-2">
+                  <Clock className="h-4 w-4" />
+                  <span className="text-sm font-medium">Time</span>
+                </div>
+                <div className="flex gap-2">
+                  <Select
+                    value={selectedTime.hours}
+                    onValueChange={(val) => handleTimeChange("hours", val)}
+                  >
+                    <SelectTrigger className="w-20">
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {hours.map((hour) => (
+                        <SelectItem key={hour} value={hour}>
+                          {hour}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                  <span className="text-sm text-muted-foreground self-center">:</span>
+                  <Select
+                    value={selectedTime.minutes}
+                    onValueChange={(val) => handleTimeChange("minutes", val)}
+                  >
+                    <SelectTrigger className="w-20">
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {minutes.map((minute) => (
+                        <SelectItem key={minute} value={minute}>
+                          {minute}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+              </div>
+            )}
+          </div>
         </PopoverContent>
       </Popover>
-      {value && <FloatingLabel htmlFor={id ?? label}>{label}</FloatingLabel>}
-      {error && (
-        <span className="text-[10px] text-red-500 absolute top-[100%] bottom-[1px] pl-1">
-          {error}
-        </span>
-      )}
+      {error && <p className="text-[9px] text-destructive ml-1">{error}</p>}
     </div>
   );
-});
+}
 
 DateInput.displayName = "DateInput";
-
-export { DateInput };
