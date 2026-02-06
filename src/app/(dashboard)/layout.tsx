@@ -2,13 +2,11 @@
 
 import { useEffect } from "react";
 import { useRouter } from "next/navigation";
-import { useTranslations } from "next-intl";
 import { MainLayout } from "@/components/layout/MainLayout";
 import { useAuth } from "@/store/AuthProvider";
 
 export default function DashboardLayout({ children }: { children: React.ReactNode }) {
   const router = useRouter();
-  const t = useTranslations("dashboard");
   const { isAuthenticated, isLoading } = useAuth();
 
   useEffect(() => {
@@ -20,7 +18,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
   if (isLoading) {
     return (
       <div className="flex min-h-screen items-center justify-center  text-slate-100">
-        {t("loading")}
+        Loading dashboard...
       </div>
     );
   }

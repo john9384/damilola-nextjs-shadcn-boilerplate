@@ -1,8 +1,28 @@
 import axios, { AxiosInstance, type AxiosRequestHeaders } from "axios";
 import { env } from "@/utils/env";
+import { CookieStore } from "@/utils/cookieStore";
 import { LocalStore } from "@/utils/localStore";
 
-const AUTH_STORE_KEY = "xanadu-auth";
+const AUTH_STORE_KEY = "metropay-admin-auth";
+const UNAUTHORIZED_MESSAGE = "Invalid or expired token.";
+const UNAUTHORIZED_ERROR = "Unauthorized";
+const LOGIN_ROUTE = "/auth/login";
+
+type UnauthorizedPayload = {
+  statusCode: number;
+  message: string;
+  error: string;
+};
+
+const isUnauthorizedSessionError = (payload: unknown): payload is UnauthorizedPayload => {
+  if (!payload || typeof payload !== "object") return false;
+  const data = payload as UnauthorizedPayload;
+  return (
+    data.statusCode === 401 &&
+    data.message === UNAUTHORIZED_MESSAGE &&
+    data.error === UNAUTHORIZED_ERROR
+  );
+};
 
 type RequestOptions = {
   headers?: AxiosRequestHeaders;
@@ -16,6 +36,7 @@ type RequestWithBodyOptions<TBody> = RequestOptions & {
 
 class ApiClient {
   private client: AxiosInstance;
+  private static isHandlingUnauthorized = false;
 
   constructor(baseUrl: string = env.apiBaseUrl) {
     this.client = axios.create({
@@ -39,6 +60,29 @@ class ApiClient {
       }
       return config;
     });
+
+    this.client.interceptors.response.use(
+      (response) => response,
+      (error) => {
+        const payload = error?.response?.data;
+        if (isUnauthorizedSessionError(payload)) {
+          this.handleUnauthorized();
+        }
+        return Promise.reject(error);
+      },
+    );
+  }
+
+  private handleUnauthorized() {
+    if (typeof window === "undefined") return;
+
+    LocalStore.removeItem(AUTH_STORE_KEY);
+    CookieStore.removeItem(AUTH_STORE_KEY);
+
+    if (window.location.pathname === LOGIN_ROUTE) return;
+    if (ApiClient.isHandlingUnauthorized) return;
+    ApiClient.isHandlingUnauthorized = true;
+    window.location.replace(LOGIN_ROUTE);
   }
 
   private cleanParams(params: RequestOptions["params"]) {

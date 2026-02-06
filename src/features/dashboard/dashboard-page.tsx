@@ -1,7 +1,6 @@
 "use client";
 
 import * as React from "react";
-import { useTranslations } from "next-intl";
 import { AppLoader } from "@/components/shared/AppLoader";
 import { CheckInput } from "@/components/shared/form/CheckInput";
 import { DateInput } from "@/components/shared/form/DateInput";
@@ -29,7 +28,6 @@ const sampleRows = [
 ];
 
 export function DashboardPage() {
-  const t = useTranslations("dashboard");
   const [fullName, setFullName] = React.useState("");
   const [email, setEmail] = React.useState("");
   const [password, setPassword] = React.useState("");
@@ -84,7 +82,7 @@ export function DashboardPage() {
   return (
     <div className="space-y-10 text-foreground">
       <header className="space-y-2">
-        <h1 className="text-2xl font-bold text-primary">{t("title")}</h1>
+        <h1 className="text-2xl font-bold text-primary">Dashboard</h1>
         <p className="text-sm text-muted-foreground">
           Example usage of shared form, table, and feedback components.
         </p>
@@ -286,7 +284,7 @@ export function DashboardPage() {
           <div className="h-24">
             <AppLoader loading color="#0EA5E9" />
           </div>
-          <p className="mt-3 text-sm text-muted-foreground">{t("loading")}</p>
+          <p className="mt-3 text-sm text-muted-foreground">Loading data...</p>
         </div>
       </section>
     </div>

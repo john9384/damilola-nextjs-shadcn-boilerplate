@@ -3,33 +3,33 @@
 import React, { createContext, useContext, useEffect, useMemo, useState } from "react";
 import { CookieStore } from "../utils/cookieStore";
 import { LocalStore } from "../utils/localStore";
-
-type User = {
-  name: string;
-  email: string;
-};
+import type { IUser } from "@/types/user";
 
 type AuthState = {
   isAuthenticated: boolean;
-  user: User | null;
+  user: IUser | null;
   token: string | null;
   isLoading: boolean;
-  login: (user: User, token: string) => Promise<void>;
+  login: (user: IUser, token: string, refreshToken?: string) => Promise<void>;
   logout: () => void;
 };
 
-export const AUTH_STORE_KEY = "boilerplate-auth";
+export const AUTH_TOKEN_KEY = "metropay-admin-auth";
 
 const AuthContext = createContext<AuthState | undefined>(undefined);
 
 export function AuthProvider({ children }: { children: React.ReactNode }) {
-  const [user, setUser] = useState<User | null>(null);
+  const [user, setUser] = useState<IUser | null>(null);
   const [token, setToken] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
-    const cookieStored = CookieStore.getItem<{ user: User; token: string }>(AUTH_STORE_KEY);
-    const localStored = LocalStore.getItem<{ user: User; token: string }>(AUTH_STORE_KEY);
+    const cookieStored = CookieStore.getItem<{ user: IUser; token: string; refreshToken?: string }>(
+      AUTH_TOKEN_KEY,
+    );
+    const localStored = LocalStore.getItem<{ user: IUser; token: string; refreshToken?: string }>(
+      AUTH_TOKEN_KEY,
+    );
     const stored = cookieStored ?? localStored;
 
     if (stored?.user && stored?.token) {
@@ -39,12 +39,12 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     setIsLoading(false);
   }, []);
 
-  const login = async (newUser: User, newToken: string) => {
+  const login = async (newUser: IUser, newToken: string, refreshToken?: string) => {
     setIsLoading(true);
     setUser(newUser);
     setToken(newToken);
-    LocalStore.setItem(AUTH_STORE_KEY, { user: newUser, token: newToken });
-    CookieStore.setItem(AUTH_STORE_KEY, { user: newUser, token: newToken });
+    LocalStore.setItem(AUTH_TOKEN_KEY, { user: newUser, token: newToken, refreshToken });
+    CookieStore.setItem(AUTH_TOKEN_KEY, { user: newUser, token: newToken, refreshToken });
     setIsLoading(false);
   };
 
@@ -52,14 +52,17 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     setIsLoading(true);
     setUser(null);
     setToken(null);
-    LocalStore.removeItem(AUTH_STORE_KEY);
-    CookieStore.removeItem(AUTH_STORE_KEY);
+    LocalStore.removeItem(AUTH_TOKEN_KEY);
+    CookieStore.removeItem(AUTH_TOKEN_KEY);
     setIsLoading(false);
+  };
+  const ensureAuthentication = (user: IUser | null) => {
+    return Boolean(user && token && user.type === "ADMIN");
   };
 
   const value = useMemo(
     () => ({
-      isAuthenticated: Boolean(user && token),
+      isAuthenticated: ensureAuthentication(user),
       user,
       token,
       isLoading,
