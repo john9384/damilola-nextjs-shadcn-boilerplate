@@ -10,20 +10,17 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
-import { useMutation } from "@tanstack/react-query";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { TextInput } from "../form/TextInput";
 import { useForm } from "react-hook-form";
+import { z } from "zod";
+import { zodResolver } from "@hookform/resolvers/zod";
 import { toast } from "sonner";
-import {
-  createAdmin,
-  createAgent,
-  createUser,
-  type ICreateUser,
-} from "@/features/admin/api/admin-api";
+import type { ICreateUser } from "@/services/user-service";
 import type { Scalar } from "@/types/global";
+import { useCreateUser } from "@/hooks/use-users";
 
 interface Props {
   userType: "ADMIN" | "AGENT" | "BASIC";
@@ -55,10 +52,54 @@ export function AddUserDialog({ userType, onCreated, triggerLabel }: Props) {
     }),
     [userType],
   );
+  const formSchema = useMemo(() => {
+    const baseSchema = z.object({
+      email: z.string().trim().min(1, "Email is required.").email("Enter a valid email address."),
+      name: z.string().trim().optional(),
+      phone: z.string().trim().optional(),
+      adminRole: z.enum(["ADMIN", "STAFF"]).optional(),
+      hasScheduledRemittance: z.boolean().optional(),
+      remittanceStartDate: z.string().trim().optional(),
+      scheduledRemittanceAmount: z.preprocess((value) => {
+        if (value === "" || value === null || value === undefined) return undefined;
+        const num = Number(value);
+        return Number.isFinite(num) ? num : undefined;
+      }, z.number().positive("Amount must be greater than 0.").optional()),
+    });
+
+    return baseSchema.superRefine((data, ctx) => {
+      if (userType === "ADMIN" && !data.adminRole) {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          message: "Admin role is required.",
+          path: ["adminRole"],
+        });
+      }
+
+      if (userType === "BASIC" && data.hasScheduledRemittance) {
+        if (!data.remittanceStartDate) {
+          ctx.addIssue({
+            code: z.ZodIssueCode.custom,
+            message: "Remittance start date is required.",
+            path: ["remittanceStartDate"],
+          });
+        }
+        if (!data.scheduledRemittanceAmount) {
+          ctx.addIssue({
+            code: z.ZodIssueCode.custom,
+            message: "Scheduled amount is required.",
+            path: ["scheduledRemittanceAmount"],
+          });
+        }
+      }
+    });
+  }, [userType]);
+
   const { handleSubmit, formState, register, reset, watch } = useForm<AddUserFormValues>({
     mode: "onChange",
     shouldUnregister: true,
     defaultValues,
+    resolver: zodResolver(formSchema),
   });
 
   const hasScheduledRemittance = watch("hasScheduledRemittance");
@@ -89,14 +130,60 @@ export function AddUserDialog({ userType, onCreated, triggerLabel }: Props) {
     }
   }, [userType]);
 
-  const { onSubmit, isSubmitting } = useCreateUser({
-    userType,
+  const createUserMutation = useCreateUser(userType, {
     onSuccess: () => {
       reset(defaultValues);
       setOpen(false);
       onCreated?.();
+      toast.success(
+        userType === "ADMIN"
+          ? "Admin created."
+          : userType === "AGENT"
+            ? "Agent created."
+            : "User created.",
+      );
+    },
+    onError: (error) => {
+      const message = (error as Scalar)?.message ?? "Error creating user";
+      toast.error(message);
     },
   });
+
+  const onSubmit = (payload: AddUserFormValues) => {
+    const sanitized = {
+      email: payload.email.trim(),
+      name: payload.name?.trim() || undefined,
+      phone: payload.phone?.trim() || undefined,
+      adminRole: payload.adminRole,
+      hasScheduledRemittance: payload.hasScheduledRemittance ?? false,
+      remittanceStartDate: payload.remittanceStartDate?.trim() || undefined,
+      scheduledRemittanceAmount: Number.isFinite(payload.scheduledRemittanceAmount ?? NaN)
+        ? payload.scheduledRemittanceAmount
+        : undefined,
+    };
+
+    const remittancePayload = sanitized.hasScheduledRemittance
+      ? {
+          hasScheduledRemittance: true,
+          remittanceStartDate: sanitized.remittanceStartDate,
+          scheduledRemittanceAmount: sanitized.scheduledRemittanceAmount,
+        }
+      : { hasScheduledRemittance: false };
+
+    const userPayload: ICreateUser = {
+      email: sanitized.email,
+      name: sanitized.name,
+      phone: sanitized.phone,
+      type: userType,
+      ...(userType === "ADMIN"
+        ? { adminRole: sanitized.adminRole ?? "ADMIN" }
+        : userType === "BASIC"
+          ? { adminRole: "STAFF", ...remittancePayload }
+          : {}),
+    };
+
+    createUserMutation.mutate(userPayload);
+  };
 
   const handleOpenChange = (nextOpen: boolean) => {
     setOpen(nextOpen);
@@ -115,10 +202,7 @@ export function AddUserDialog({ userType, onCreated, triggerLabel }: Props) {
           <DialogTitle>{dialogCopy.title}</DialogTitle>
           <DialogDescription>{dialogCopy.description}</DialogDescription>
         </DialogHeader>
-        <form
-          onSubmit={handleSubmit(onSubmit, (err: Scalar) => console.log(err))}
-          className="space-y-6"
-        >
+        <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
           <div className="space-y-4">
             <TextInput
               label="Email"
@@ -126,13 +210,7 @@ export function AddUserDialog({ userType, onCreated, triggerLabel }: Props) {
               type="email"
               autoComplete="email"
               error={formState.errors.email?.message}
-              {...register("email", {
-                required: "Email is required.",
-                pattern: {
-                  value: /^[^\s@]+@[^\s@]+\.[^\s@]+$/,
-                  message: "Please enter a valid email address.",
-                },
-              })}
+              {...register("email")}
             />
             <TextInput
               label="Name"
@@ -156,7 +234,7 @@ export function AddUserDialog({ userType, onCreated, triggerLabel }: Props) {
               <select
                 id="admin-role"
                 className="flex h-12 w-full rounded-md border border-input bg-transparent px-3 py-1 text-base transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:cursor-not-allowed disabled:opacity-50 md:text-sm"
-                {...register("adminRole", { required: "Admin role is required." })}
+                {...register("adminRole")}
               >
                 <option value="ADMIN">Admin</option>
                 <option value="STAFF">Staff</option>
@@ -186,9 +264,7 @@ export function AddUserDialog({ userType, onCreated, triggerLabel }: Props) {
                     <Input
                       id="remittance-start-date"
                       type="date"
-                      {...register("remittanceStartDate", {
-                        required: "Remittance start date is required.",
-                      })}
+                      {...register("remittanceStartDate")}
                     />
                     {formState.errors.remittanceStartDate?.message ? (
                       <span className="text-[10px] text-red-500">
@@ -205,11 +281,6 @@ export function AddUserDialog({ userType, onCreated, triggerLabel }: Props) {
                       step="1"
                       {...register("scheduledRemittanceAmount", {
                         valueAsNumber: true,
-                        min: {
-                          value: 1,
-                          message: "Amount must be greater than 0.",
-                        },
-                        required: "Scheduled amount is required.",
                       })}
                     />
                     {formState.errors.scheduledRemittanceAmount?.message ? (
@@ -222,90 +293,13 @@ export function AddUserDialog({ userType, onCreated, triggerLabel }: Props) {
               )}
             </div>
           )}
+          <DialogFooter className="mt-8">
+            <Button type="submit" disabled={createUserMutation.isPending}>
+              {createUserMutation.isPending ? "Creating..." : dialogCopy.submitLabel}
+            </Button>
+          </DialogFooter>
         </form>
-        <DialogFooter className="mt-8">
-          <Button type="submit" disabled={isSubmitting || !formState.isValid}>
-            {isSubmitting ? "Creating..." : dialogCopy.submitLabel}
-          </Button>
-        </DialogFooter>
       </DialogContent>
     </Dialog>
   );
-}
-
-function useCreateUser({
-  userType,
-  onSuccess,
-}: {
-  userType: Props["userType"];
-  onSuccess?: () => void;
-}) {
-  const mutation = useMutation({
-    mutationFn: (payload: AddUserFormValues) => {
-      const sanitized = {
-        email: payload.email.trim(),
-        name: payload.name?.trim() || undefined,
-        phone: payload.phone?.trim() || undefined,
-        adminRole: payload.adminRole,
-        hasScheduledRemittance: payload.hasScheduledRemittance ?? false,
-        remittanceStartDate: payload.remittanceStartDate?.trim() || undefined,
-        scheduledRemittanceAmount: Number.isFinite(payload.scheduledRemittanceAmount ?? NaN)
-          ? payload.scheduledRemittanceAmount
-          : undefined,
-      };
-
-      if (userType === "ADMIN") {
-        return createAdmin({
-          email: sanitized.email,
-          name: sanitized.name,
-          phone: sanitized.phone,
-          adminRole: sanitized.adminRole ?? "ADMIN",
-        });
-      }
-      if (userType === "AGENT") {
-        return createAgent({
-          email: sanitized.email,
-          name: sanitized.name,
-          phone: sanitized.phone,
-        });
-      }
-
-      const remittancePayload = sanitized.hasScheduledRemittance
-        ? {
-            hasScheduledRemittance: true,
-            remittanceStartDate: sanitized.remittanceStartDate,
-            scheduledRemittanceAmount: sanitized.scheduledRemittanceAmount,
-          }
-        : { hasScheduledRemittance: false };
-
-      const userPayload: ICreateUser = {
-        email: sanitized.email,
-        name: sanitized.name,
-        phone: sanitized.phone,
-        type: "BASIC",
-        adminRole: "STAFF",
-        ...remittancePayload,
-      };
-      return createUser(userPayload);
-    },
-    onSuccess: () => {
-      toast.success(
-        userType === "ADMIN"
-          ? "Admin created."
-          : userType === "AGENT"
-            ? "Agent created."
-            : "User created.",
-      );
-      onSuccess?.();
-    },
-    onError: (error: Scalar) => {
-      toast.error(error?.message ?? "Error creating user");
-    },
-  });
-
-  return {
-    onSubmit: (data: AddUserFormValues) => mutation.mutate(data),
-    isSubmitting: mutation.isPending,
-    error: mutation.error,
-  };
 }

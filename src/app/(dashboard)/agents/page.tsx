@@ -1,21 +1,17 @@
 "use client";
 
 import { useMemo, useState } from "react";
-import { useQuery } from "@tanstack/react-query";
 import { TableContainer } from "@/components/shared/table/table-container";
 import { TableHeader } from "@/components/shared/table/table-header";
 import { TablePagination } from "@/components/shared/table/table-pagination";
 import { AddUserDialog } from "@/components/shared/AddUserDialog";
-import { listAgents, type PaginatedUsers } from "@/features/admin/api/admin-api";
 import Link from "next/link";
+import { useFetchUser } from "@/hooks/use-users";
 
 export default function AgentsPage() {
   const [search, setSearch] = useState("");
   const [page, setPage] = useState(1);
-  const { data, isLoading, refetch } = useQuery<PaginatedUsers>({
-    queryKey: ["agents"],
-    queryFn: listAgents,
-  });
+  const { list: data, isLoading, refetch } = useFetchUser("AGENT");
 
   const filtered = useMemo(() => {
     const normalized = search.trim().toLowerCase();

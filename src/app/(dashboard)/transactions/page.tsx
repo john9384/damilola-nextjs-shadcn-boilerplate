@@ -2,7 +2,7 @@
 
 import { useMemo, useState } from "react";
 import { useQuery } from "@tanstack/react-query";
-import { listTransactions } from "@/features/admin/api/admin-api";
+import { listTransactions } from "@/services/user-service";
 import { TableContainer } from "@/components/shared/table/table-container";
 import { TableHeader } from "@/components/shared/table/table-header";
 import { TablePagination } from "@/components/shared/table/table-pagination";

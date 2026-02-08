@@ -2,7 +2,7 @@
 
 import { useParams } from "next/navigation";
 import { useQuery } from "@tanstack/react-query";
-import { getAdmin } from "@/features/admin/api/admin-api";
+import { getAdmin } from "@/services/user-service";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
 
@@ -29,9 +29,7 @@ export default function AdminDetailPage() {
       </header>
 
       {isLoading ? (
-        <div className="py-10 text-center text-sm text-muted-foreground">
-          Loading admin...
-        </div>
+        <div className="py-10 text-center text-sm text-muted-foreground">Loading admin...</div>
       ) : data ? (
         <div className="grid gap-4 rounded-2xl border border-border bg-card p-6 text-sm">
           <div>
@@ -56,9 +54,7 @@ export default function AdminDetailPage() {
           </div>
         </div>
       ) : (
-        <div className="py-10 text-center text-sm text-muted-foreground">
-          Admin not found.
-        </div>
+        <div className="py-10 text-center text-sm text-muted-foreground">Admin not found.</div>
       )}
     </div>
   );

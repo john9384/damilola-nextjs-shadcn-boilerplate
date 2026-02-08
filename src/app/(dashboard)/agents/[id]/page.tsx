@@ -1,20 +1,15 @@
 "use client";
 
 import { useParams } from "next/navigation";
-import { useQuery } from "@tanstack/react-query";
-import { getAgent } from "@/features/admin/api/admin-api";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
+import { useGetUser } from "@/hooks/use-users";
 
 export default function AgentDetailPage() {
   const params = useParams();
   const id = params?.id as string;
 
-  const { data, isLoading } = useQuery({
-    queryKey: ["agent", id],
-    queryFn: () => getAgent(id),
-    enabled: Boolean(id),
-  });
+  const { data, isLoading } = useGetUser("AGENT", id);
 
   return (
     <div className="space-y-6 text-foreground">

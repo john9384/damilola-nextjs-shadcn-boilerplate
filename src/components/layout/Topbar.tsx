@@ -62,7 +62,7 @@ export function Topbar({ onToggle }: TopbarProps) {
 
           <DropdownMenuItem
             onClick={() => {
-              router.push("/profile");
+              router.push("/settings/profile");
             }}
             className="flex items-center gap-2"
           >

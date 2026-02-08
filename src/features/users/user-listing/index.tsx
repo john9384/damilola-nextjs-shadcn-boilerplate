@@ -4,8 +4,7 @@ import { TableContainer } from "@/components/shared/table/table-container";
 import { TableHeader } from "@/components/shared/table/table-header";
 import { TablePagination } from "@/components/shared/table/table-pagination";
 import { AddUserDialog } from "@/components/shared/AddUserDialog";
-import { listUsers, type PaginatedUsers } from "@/features/admin/api/admin-api";
-import { useQuery } from "@tanstack/react-query";
+import { useFetchUser } from "@/hooks/use-users";
 import Link from "next/link";
 import { useMemo, useState } from "react";
 
@@ -13,10 +12,7 @@ export function UserListingPage() {
   const [search, setSearch] = useState("");
   const [page, setPage] = useState(1);
 
-  const { data, isLoading, refetch } = useQuery<PaginatedUsers>({
-    queryKey: ["users"],
-    queryFn: listUsers,
-  });
+  const { list: data, isLoading, refetch } = useFetchUser("BASIC");
 
   const filtered = useMemo(() => {
     const normalized = search.trim().toLowerCase();

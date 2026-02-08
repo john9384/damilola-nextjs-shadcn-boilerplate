@@ -13,15 +13,12 @@ import {
   SheetHeader,
   SheetTitle,
 } from "@/components/ui/sheet";
-import {
-  listAdmins,
-  type AdminUser,
-  type PaginatedUsers,
-  updateAdminStatus,
-} from "@/features/admin/api/admin-api";
+import { userService, type AdminUser, type PaginatedUsers } from "@/services/user-service";
 import { TableContainer } from "@/components/shared/table/table-container";
 import { TableHeader } from "@/components/shared/table/table-header";
 import { TablePagination } from "@/components/shared/table/table-pagination";
+import type { Scalar } from "@/types/global";
+import { useFetchUser } from "@/hooks/use-users";
 
 type ConfirmationAction = "suspend" | "remove" | null;
 
@@ -32,14 +29,12 @@ export function AdminManagement() {
   const [selectedAdmin, setSelectedAdmin] = useState<AdminUser | null>(null);
   const [confirmationAction, setConfirmationAction] = useState<ConfirmationAction>(null);
 
-  const { data, isLoading, refetch } = useQuery<PaginatedUsers>({
-    queryKey: ["admins"],
-    queryFn: listAdmins,
-  });
+  const { list, isLoading, refetch } = useFetchUser("ADMIN");
 
   const statusMutation = useMutation({
-    mutationFn: ({ id, status }: { id: string; status: "SUSPENDED" | "ACTIVE" }) =>
-      updateAdminStatus(id, status),
+    mutationFn: ({ id, status }: { id: string; status: "SUSPENDED" | "ACTIVE" }) => {
+      return userService.updateAdminStatus(id, status);
+    },
     onSuccess: (updated) => {
       setSelectedAdmin(updated);
       refetch();
@@ -49,15 +44,16 @@ export function AdminManagement() {
 
   const filtered = useMemo(() => {
     const normalized = search.trim().toLowerCase();
-    if (!data) return [];
-    const items = data.items ?? [];
+    if (!list) return [];
+    const items = list.items ?? [];
     if (!normalized) return items;
     return items.filter((admin) =>
       `${admin.name ?? ""} ${admin.email}`.toLowerCase().includes(normalized),
     );
-  }, [data, search]);
+  }, [list, search]);
 
   const pageSize = 10;
+  const skeletonColumnWidths = ["55%", "75%", "45%"];
   const totalItems = filtered.length;
   const totalPages = Math.max(1, Math.ceil(totalItems / pageSize));
   const startIndex = totalItems === 0 ? 0 : (page - 1) * pageSize + 1;
@@ -125,7 +121,32 @@ export function AdminManagement() {
         }
       >
         {isLoading ? (
-          <div className="py-10 text-center text-sm text-muted-foreground">Loading admins...</div>
+          <div className="overflow-x-auto">
+            <table className="w-full text-sm">
+              <thead className="text-left text-xs uppercase text-muted-foreground">
+                <tr>
+                  <th className="py-3">Name</th>
+                  <th>Email</th>
+                  <th>Status</th>
+                </tr>
+              </thead>
+              <tbody>
+                {Array.from({ length: pageSize }).map((_, rowIdx) => (
+                  <tr key={`skeleton-${rowIdx}`} className="border-t border-border">
+                    {skeletonColumnWidths.map((width, colIdx) => (
+                      <td key={colIdx} className="py-3">
+                        <div
+                          className="h-4 rounded bg-muted/70 animate-pulse"
+                          style={{ width }}
+                          aria-hidden="true"
+                        />
+                      </td>
+                    ))}
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
         ) : (
           <div className="overflow-x-auto">
             <table className="w-full text-sm">
