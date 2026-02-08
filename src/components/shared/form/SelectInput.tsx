@@ -52,7 +52,7 @@ export const SelectInput: React.FC<SelectInputProps> = ({
       >
         <SelectTrigger
           id={name}
-          className={`peer h-14 w-full rounded-[10px] border border-input px-3 pr-8 text-sm font-normal text-[#212121] focus:outline-none focus:ring-1 focus:ring-ring data-[placeholder]:text-[#C8C8C8] 
+          className={`bg-white peer h-14 w-full rounded-[10px] border border-input px-3 pr-8 text-sm font-normal text-[#212121] focus:outline-none focus:ring-1 focus:ring-ring data-[placeholder]:text-[#C8C8C8] 
           ${error ? "border-red-500 focus:ring-red-500" : ""}`}
         >
           <SelectValue placeholder={placeholder} />

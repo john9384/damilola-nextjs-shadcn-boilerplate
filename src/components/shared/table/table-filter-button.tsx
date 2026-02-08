@@ -1,24 +1,23 @@
 "use client";
 
+import * as React from "react";
 import { Filter } from "lucide-react";
 import { cn } from "@/lib/utils";
 
-export interface TableFilterButtonProps {
+export interface TableFilterButtonProps
+  extends React.ButtonHTMLAttributes<HTMLButtonElement> {
   isActive?: boolean;
-  onClick: () => void;
   activeFilterCount?: number;
   className?: string;
 }
 
-export function TableFilterButton({
-  isActive = false,
-  onClick,
-  activeFilterCount = 0,
-  className,
-}: TableFilterButtonProps) {
+export const TableFilterButton = React.forwardRef<
+  HTMLButtonElement,
+  TableFilterButtonProps
+>(({ isActive = false, activeFilterCount = 0, className, ...props }, ref) => {
   return (
     <button
-      onClick={onClick}
+      ref={ref}
       className={cn(
         "relative flex items-center justify-center size-10 rounded-lg border transition-all",
         isActive
@@ -28,6 +27,7 @@ export function TableFilterButton({
       )}
       title="Filter"
       type="button"
+      {...props}
     >
       <Filter className="size-5" />
       {activeFilterCount > 0 && (
@@ -37,4 +37,6 @@ export function TableFilterButton({
       )}
     </button>
   );
-}
+});
+
+TableFilterButton.displayName = "TableFilterButton";

@@ -24,6 +24,7 @@ export function AgentListingPage() {
   }, [data, search]);
 
   const pageSize = 10;
+  const skeletonColumnWidths = ["55%", "75%", "50%", "40%", "35%"];
   const totalItems = filtered.length;
   const totalPages = Math.max(1, Math.ceil(totalItems / pageSize));
   const startIndex = totalItems === 0 ? 0 : (page - 1) * pageSize + 1;
@@ -66,7 +67,34 @@ export function AgentListingPage() {
         }
       >
         {isLoading ? (
-          <div className="py-10 text-center text-sm text-muted-foreground">Loading agents...</div>
+          <div className="overflow-x-auto">
+            <table className="w-full text-sm">
+              <thead className="text-left text-xs uppercase text-muted-foreground">
+                <tr>
+                  <th className="py-3">Name</th>
+                  <th>Email</th>
+                  <th>Phone</th>
+                  <th>Status</th>
+                  <th>Actions</th>
+                </tr>
+              </thead>
+              <tbody>
+                {Array.from({ length: pageSize }).map((_, rowIdx) => (
+                  <tr key={`skeleton-${rowIdx}`} className="border-t border-border">
+                    {skeletonColumnWidths.map((width, colIdx) => (
+                      <td key={colIdx} className="py-3">
+                        <div
+                          className="h-4 rounded bg-muted/70 animate-pulse"
+                          style={{ width }}
+                          aria-hidden="true"
+                        />
+                      </td>
+                    ))}
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
         ) : (
           <div className="overflow-x-auto">
             <table className="w-full text-sm">
