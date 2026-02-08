@@ -5,13 +5,20 @@ import { apiClient } from "@/lib/api-client";
 export type IUser = {
   id: string;
   email: string;
+  adminRole?: "STAFF" | "ADMIN" | null;
   role: string;
   type: string;
   status: string;
   emailVerified: boolean;
+  phoneVerified?: boolean;
   name: string | null;
   phone: string | null;
   barcodeValue: string | null;
+  hasScheduledRemittance?: boolean;
+  remittanceStartDate?: string | null;
+  scheduledRemittanceAmount?: string | number | null;
+  remittanceOutstanding?: string | number | null;
+  nin?: string | null;
   createdAt: string;
 };
 
@@ -28,7 +35,23 @@ export type ICreateUser = {
 
 export type AdminUser = Pick<
   IUser,
-  "id" | "email" | "phone" | "role" | "name" | "type" | "status" | "createdAt"
+  | "id"
+  | "email"
+  | "adminRole"
+  | "phone"
+  | "phoneVerified"
+  | "role"
+  | "name"
+  | "type"
+  | "status"
+  | "emailVerified"
+  | "hasScheduledRemittance"
+  | "remittanceStartDate"
+  | "scheduledRemittanceAmount"
+  | "remittanceOutstanding"
+  | "nin"
+  | "createdAt"
+  | "barcodeValue"
 >;
 
 export type AdminTransaction = {
@@ -74,7 +97,7 @@ class UserService {
       response = await apiClient.get<ApiResponse<PaginatedUsers>>("/users/admin");
     }
     if (userType === "AGENT") {
-      response = await apiClient.get<ApiResponse<PaginatedUsers>>("/users/admin");
+      response = await apiClient.get<ApiResponse<PaginatedUsers>>("/users/agent");
     }
 
     if (userType === "BASIC") {
