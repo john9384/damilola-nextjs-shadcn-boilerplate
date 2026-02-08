@@ -13,6 +13,7 @@ import {
   ShieldCheck,
   UserCheck,
   X,
+  Banknote,
 } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
@@ -49,6 +50,11 @@ const navigation = [
     icon: Wallet,
   },
   {
+    key: "remittance",
+    href: "/remittance",
+    icon: Banknote,
+  },
+  {
     key: "settings",
     href: "/settings",
     icon: Settings,
@@ -65,6 +71,7 @@ const navigationLabels: Record<string, string> = {
   users: "Users",
   admins: "Admins",
   transactions: "Transactions",
+  remittance: "Remittance",
   settings: "Settings",
 };
 

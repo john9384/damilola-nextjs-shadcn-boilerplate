@@ -5,8 +5,7 @@ import { useMutation, useQuery } from "@tanstack/react-query";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
+import { TextInput } from "@/components/shared/form/TextInput";
 import {
   settingsService,
   type SystemSettings,
@@ -117,36 +116,29 @@ export function SystemSettingsPage() {
             <div className="py-8 text-sm text-muted-foreground">Loading system settings...</div>
           ) : (
             <form className="space-y-4" onSubmit={onSubmit}>
-              <div className="space-y-2">
-                <Label htmlFor="app-name">App name</Label>
-                <Input
+              <div className="space-y-4">
+                <TextInput
+                  label="App name"
                   id="app-name"
                   value={form.appName}
                   onChange={(event) => handleChange("appName", event.target.value)}
                 />
-              </div>
-
-              <div className="space-y-2">
-                <Label htmlFor="paystack-pub-key">Paystack public key</Label>
-                <Input
+                <TextInput
+                  label="Paystack public key"
                   id="paystack-pub-key"
+                  type="password"
                   value={form.paystackPubKey}
                   onChange={(event) => handleChange("paystackPubKey", event.target.value)}
                 />
-              </div>
-
-              <div className="space-y-2">
-                <Label htmlFor="paystack-private-key">Paystack private key</Label>
-                <Input
+                <TextInput
+                  label="Paystack private key"
                   id="paystack-private-key"
+                  type="password"
                   value={form.paystackPrivateKey}
                   onChange={(event) => handleChange("paystackPrivateKey", event.target.value)}
                 />
-              </div>
-
-              <div className="space-y-2">
-                <Label htmlFor="settings-password">System password</Label>
-                <Input
+                <TextInput
+                  label="System password"
                   id="settings-password"
                   type="password"
                   value={form.password}

@@ -5,6 +5,8 @@ import { Button } from "@/components/ui/button";
 import Link from "next/link";
 import { useGetUser } from "@/hooks/use-users";
 import { UserDetailsTabs } from "@/components/shared/UserDetailsComponents";
+import { TransactionsTable } from "@/features/transactions/transactions-table";
+import { RemittanceTable } from "@/features/remittance/remittance-table";
 
 export function UserDetailPage() {
   const params = useParams();
@@ -24,7 +26,15 @@ export function UserDetailPage() {
         </Button>
       </header>
 
-      <UserDetailsTabs user={data} isLoading={isLoading} entityLabel="user" />
+      <UserDetailsTabs
+        user={data}
+        isLoading={isLoading}
+        entityLabel="user"
+        transactionsContent={
+          <TransactionsTable lockedFilters={{ userId: id }} />
+        }
+        remittanceContent={<RemittanceTable lockedFilters={{ userId: id }} />}
+      />
     </div>
   );
 }

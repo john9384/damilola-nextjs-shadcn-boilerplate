@@ -78,15 +78,8 @@ export function LoginPage() {
         </Button>
       </form>
 
-      <p className="mt-6 text-center text-sm text-muted-foreground">
-        New here?{" "}
-        <button
-          type="button"
-          className="text-primary underline-offset-4 hover:underline"
-          onClick={() => router.push("/auth/signup")}
-        >
-          Create an account
-        </button>
+      <p className="mt-8 text-center text-xs text-muted-foreground">
+        powered by <span className="font-semibold text-primary">MetroPay</span>
       </p>
     </div>
   );

@@ -1,5 +1,6 @@
 "use client";
 
+import type { ReactNode } from "react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { cn } from "@/lib/utils";
 import { UserBioTab } from "./user-bio-tab";
@@ -11,6 +12,9 @@ type UserDetailsTabsProps = {
   user?: IUser | null;
   entityLabel?: string;
   className?: string;
+  transactionsContent?: ReactNode;
+  remittanceContent?: ReactNode;
+  settingsContent?: ReactNode;
 };
 
 export function UserDetailsTabs({
@@ -18,6 +22,9 @@ export function UserDetailsTabs({
   user,
   entityLabel,
   className,
+  transactionsContent,
+  remittanceContent,
+  settingsContent,
 }: UserDetailsTabsProps) {
   const triggerClassName =
     "flex-none rounded-full border-0 px-5 py-2 text-sm font-medium text-muted-foreground data-[state=active]:bg-primary data-[state=active]:text-primary-foreground";
@@ -43,15 +50,21 @@ export function UserDetailsTabs({
         <UserBioTab user={user} isLoading={isLoading} entityLabel={entityLabel} />
       </TabsContent>
       <TabsContent value="transactions">
-        <UserDetailsPlaceholder>Transactions view coming soon.</UserDetailsPlaceholder>
+        {transactionsContent ?? (
+          <UserDetailsPlaceholder>Transactions view coming soon.</UserDetailsPlaceholder>
+        )}
       </TabsContent>
       <TabsContent value="remittance">
-        <UserDetailsPlaceholder>
-          {user?.type === "AGENT" ? "Remittance not applicable for agents." : "Coming soon."}
-        </UserDetailsPlaceholder>
+        {remittanceContent ?? (
+          <UserDetailsPlaceholder>
+            {user?.type === "AGENT" ? "Remittance not applicable for agents." : "Coming soon."}
+          </UserDetailsPlaceholder>
+        )}
       </TabsContent>
       <TabsContent value="settings">
-        <UserDetailsPlaceholder>Settings view coming soon.</UserDetailsPlaceholder>
+        {settingsContent ?? (
+          <UserDetailsPlaceholder>Settings view coming soon.</UserDetailsPlaceholder>
+        )}
       </TabsContent>
     </Tabs>
   );
