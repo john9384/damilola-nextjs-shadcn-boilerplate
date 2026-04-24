@@ -3,18 +3,7 @@
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { useAuth } from "@/store/AuthProvider";
-import {
-  LayoutDashboard,
-  LogOut,
-  Menu,
-  Settings,
-  Users,
-  Wallet,
-  ShieldCheck,
-  UserCheck,
-  X,
-  Banknote,
-} from "lucide-react";
+import { LayoutDashboard, LogOut, Menu, X } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
@@ -29,36 +18,6 @@ const navigation = [
     href: "/",
     icon: LayoutDashboard,
   },
-  {
-    key: "agents",
-    href: "/agents",
-    icon: UserCheck,
-  },
-  {
-    key: "users",
-    href: "/users",
-    icon: Users,
-  },
-  {
-    key: "admins",
-    href: "/admins",
-    icon: ShieldCheck,
-  },
-  {
-    key: "transactions",
-    href: "/transactions",
-    icon: Wallet,
-  },
-  {
-    key: "remittance",
-    href: "/remittance",
-    icon: Banknote,
-  },
-  {
-    key: "settings",
-    href: "/settings",
-    icon: Settings,
-  },
 ];
 
 type SidebarProps = {
@@ -67,12 +26,6 @@ type SidebarProps = {
 
 const navigationLabels: Record<string, string> = {
   dashboard: "Dashboard",
-  agents: "Agents",
-  users: "Users",
-  admins: "Admins",
-  transactions: "Transactions",
-  remittance: "Remittance",
-  settings: "Settings",
 };
 
 export function Sidebar({ isCollapsed }: SidebarProps) {

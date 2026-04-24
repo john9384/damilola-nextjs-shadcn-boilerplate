@@ -1,7 +1,6 @@
 "use client";
 
-import { Menu, Settings, LogOut, ChevronDown } from "lucide-react";
-import { useRouter } from "next/navigation";
+import { Menu, LogOut, ChevronDown } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
   DropdownMenu,
@@ -17,7 +16,6 @@ type TopbarProps = {
 
 export function Topbar({ onToggle }: TopbarProps) {
   const { user, logout } = useAuth();
-  const router = useRouter();
 
   const getInitials = (name: string) => {
     return name
@@ -57,18 +55,6 @@ export function Topbar({ onToggle }: TopbarProps) {
               <p className="text-xs text-gray-500 mt-0.5">{user?.email || ""}</p>
             </div>
           </DropdownMenuHeader>
-
-          <DropdownMenuSeparator />
-
-          <DropdownMenuItem
-            onClick={() => {
-              router.push("/settings/profile");
-            }}
-            className="flex items-center gap-2"
-          >
-            <Settings className="size-4" />
-            Profile settings
-          </DropdownMenuItem>
 
           <DropdownMenuSeparator />
 
