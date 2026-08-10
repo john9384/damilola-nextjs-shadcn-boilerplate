@@ -52,7 +52,7 @@ export class CookieStore {
   static clearItems(prefix?: string): void {
     try {
       const cookies = getCookies();
-      Object.keys(cookies).forEach((name) => {
+      Object.keys(cookies as any).forEach((name) => {
         if (!prefix || name.startsWith(prefix)) deleteCookie(name);
       });
     } catch (error) {

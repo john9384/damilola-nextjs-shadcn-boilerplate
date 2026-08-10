@@ -15,6 +15,7 @@ import { TextInput } from "@/components/shared/form/TextInput";
 import { TableContainer } from "@/components/shared/table/table-container";
 import { TableHeader } from "@/components/shared/table/table-header";
 import { TablePagination } from "@/components/shared/table/table-pagination";
+import type { Scalar } from "@/types/global";
 
 const sampleRows = [
   { name: "Ada Lovelace", role: "Admin", status: "Active", lastActive: "2h ago" },
@@ -102,7 +103,7 @@ export function DashboardPage() {
             id="fullName"
             placeholder="Ada Lovelace"
             value={fullName}
-            onChange={(event) => setFullName(event.target.value)}
+            onChange={(event: Scalar) => setFullName(event.target.value)}
           />
           <TextInput
             label="Email address"
@@ -110,19 +111,19 @@ export function DashboardPage() {
             type="email"
             placeholder="ada@example.com"
             value={email}
-            onChange={(event) => setEmail(event.target.value)}
+            onChange={(event: Scalar) => setEmail(event.target.value)}
           />
           <PasswordInput
             label="Password"
             id="password"
             placeholder="********"
             value={password}
-            onChange={(event) => setPassword(event.target.value)}
+            onChange={(event: Scalar) => setPassword(event.target.value)}
           />
           <PhoneNumberInput
             label="Phone number"
             value={phone}
-            onChange={(event) => setPhone(event.target.value)}
+            onChange={(event: Scalar) => setPhone(event.target.value)}
           />
           <SelectInput
             label="Role"
@@ -160,7 +161,7 @@ export function DashboardPage() {
             <TextAreaInput
               label="About you"
               value={about}
-              onChange={(event) => setAbout(event.target.value)}
+              onChange={(event: Scalar) => setAbout(event.target.value)}
             />
           </div>
           <div className="md:col-span-2">
