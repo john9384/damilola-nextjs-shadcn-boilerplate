@@ -1,9 +1,12 @@
 "use client";
 
-import React, { createContext, useContext, useEffect, useMemo, useState } from "react";
-import { CookieStore } from "../utils/cookieStore";
-import { LocalStore } from "../utils/localStore";
+import { createContext, useContext, useMemo, useSyncExternalStore, type ReactNode } from "react";
+import { CookieStore } from "@/utils/cookieStore";
+import { LocalStore } from "@/utils/localStore";
+import { AUTH_CHANGE_EVENT, AUTH_TOKEN_KEY } from "@/lib/auth";
 import type { IUser } from "@/types/user";
+
+type Session = { user: IUser; token: string; refreshToken?: string };
 
 type AuthState = {
   isAuthenticated: boolean;
@@ -14,71 +17,59 @@ type AuthState = {
   logout: () => void;
 };
 
-export const AUTH_TOKEN_KEY = "metropay-admin-auth";
-
 const AuthContext = createContext<AuthState | undefined>(undefined);
 
-export function AuthProvider({ children }: { children: React.ReactNode }) {
-  const [user, setUser] = useState<IUser | null>(null);
-  const [token, setToken] = useState<string | null>(null);
-  const [isLoading, setIsLoading] = useState(true);
-
-  useEffect(() => {
-    const cookieStored = CookieStore.getItem<{ user: IUser; token: string; refreshToken?: string }>(
-      AUTH_TOKEN_KEY,
-    );
-    const localStored = LocalStore.getItem<{ user: IUser; token: string; refreshToken?: string }>(
-      AUTH_TOKEN_KEY,
-    );
-    const stored = cookieStored ?? localStored;
-
-    if (stored?.user && stored?.token) {
-      setUser(stored.user);
-      setToken(stored.token);
-    }
-    setIsLoading(false);
-  }, []);
-
-  const login = async (newUser: IUser, newToken: string, refreshToken?: string) => {
-    setIsLoading(true);
-    setUser(newUser);
-    setToken(newToken);
-    LocalStore.setItem(AUTH_TOKEN_KEY, { user: newUser, token: newToken, refreshToken });
-    CookieStore.setItem(AUTH_TOKEN_KEY, { user: newUser, token: newToken, refreshToken });
-    setIsLoading(false);
+function subscribe(onChange: () => void) {
+  window.addEventListener("storage", onChange);
+  window.addEventListener(AUTH_CHANGE_EVENT, onChange);
+  return () => {
+    window.removeEventListener("storage", onChange);
+    window.removeEventListener(AUTH_CHANGE_EVENT, onChange);
   };
+}
 
-  const logout = () => {
-    setIsLoading(true);
-    setUser(null);
-    setToken(null);
-    LocalStore.removeItem(AUTH_TOKEN_KEY);
-    CookieStore.removeItem(AUTH_TOKEN_KEY);
-    setIsLoading(false);
-  };
-  const ensureAuthentication = (user: IUser | null) => {
-    return Boolean(user && token && user.type === "ADMIN");
-  };
+function getSnapshot() {
+  const session =
+    CookieStore.getItem<Session>(AUTH_TOKEN_KEY) ?? LocalStore.getItem<Session>(AUTH_TOKEN_KEY);
+  return JSON.stringify(session);
+}
 
-  const value = useMemo(
-    () => ({
-      isAuthenticated: ensureAuthentication(user),
-      user,
-      token,
-      isLoading,
+function getServerSnapshot() {
+  return undefined;
+}
+
+async function login(user: IUser, token: string, refreshToken?: string) {
+  const session = { user, token, refreshToken };
+  LocalStore.setItem(AUTH_TOKEN_KEY, session);
+  CookieStore.setItem(AUTH_TOKEN_KEY, session);
+  window.dispatchEvent(new Event(AUTH_CHANGE_EVENT));
+}
+
+function logout() {
+  LocalStore.removeItem(AUTH_TOKEN_KEY);
+  CookieStore.removeItem(AUTH_TOKEN_KEY);
+  window.dispatchEvent(new Event(AUTH_CHANGE_EVENT));
+}
+
+export function AuthProvider({ children }: { children: ReactNode }) {
+  const snapshot = useSyncExternalStore(subscribe, getSnapshot, getServerSnapshot);
+  const value = useMemo<AuthState>(() => {
+    const session: Session | null = snapshot ? JSON.parse(snapshot) : null;
+    return {
+      isAuthenticated: Boolean(session?.user && session?.token),
+      user: session?.user ?? null,
+      token: session?.token ?? null,
+      isLoading: snapshot === undefined,
       login,
       logout,
-    }),
-    [user, token, isLoading],
-  );
+    };
+  }, [snapshot]);
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
 }
 
 export function useAuth() {
   const context = useContext(AuthContext);
-  if (!context) {
-    throw new Error("useAuth must be used within an AuthProvider");
-  }
+  if (!context) throw new Error("useAuth must be used within an AuthProvider");
   return context;
 }

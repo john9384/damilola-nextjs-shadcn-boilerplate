@@ -14,11 +14,8 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "ESiRS-Pay",
-  description: "ESiRS-Pay admin dashboard",
-  icons: {
-    icon: "https://res.cloudinary.com/djnboqpze/image/upload/v1770406971/esirs_zcttct.jpg",
-  },
+  title: "Auth starter",
+  description: "A simple login and authentication dashboard.",
 };
 
 export default async function RootLayout({

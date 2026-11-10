@@ -3,29 +3,27 @@
 import { AxiosError } from "axios";
 import { useMutation } from "@tanstack/react-query";
 import { z, ZodError } from "zod";
-import { toast } from "sonner";
 import { apiClient } from "@/lib/api-client";
 import { useAuth } from "@/store/AuthProvider";
 import type { IUser } from "@/types/user";
 
-export const getLoginSchema = () =>
-  z.object({
-    email: z.string().email("Please enter a valid email address."),
-    password: z.string().min(6, "Password must be at least 6 characters."),
-  });
+export const loginSchema = z.object({
+  email: z.string().email("Please enter a valid email address."),
+  password: z.string().min(6, "Password must be at least 6 characters."),
+});
 
-type LoginInput = z.infer<ReturnType<typeof getLoginSchema>>;
+export type LoginInput = z.infer<typeof loginSchema>;
 interface LoginResponse {
   content: {
     user: IUser;
     tokens: {
       accessToken: string;
-      refreshToken: string;
+      refreshToken?: string;
     };
   };
 }
 
-const getLoginErrorMessage = (error: unknown) => {
+export const getLoginErrorMessage = (error: unknown) => {
   if (error instanceof ZodError) {
     return error.issues[0]?.message ?? "Please double-check your login details.";
   }
@@ -52,30 +50,18 @@ const getLoginErrorMessage = (error: unknown) => {
 
 export function useLogin() {
   const { login } = useAuth();
-  const loginSchema = getLoginSchema();
 
   const mutation = useMutation({
     mutationFn: async (values: LoginInput) => {
       const parsed = loginSchema.parse(values);
-      const response = await apiClient.post<LoginResponse>("/auth/login", {
-        ...parsed,
-        type: "ADMIN",
-      });
+      const response = await apiClient.post<LoginResponse>("/auth/login", parsed);
 
       const { user, tokens } = response.content;
 
-      if (user.type !== "ADMIN") {
-        throw new Error("Invalid credentials.");
-      }
-
       return { user, tokens };
     },
-    onSuccess: ({ user, tokens }) => {
-      login(user, tokens.accessToken, tokens.refreshToken);
-      toast.success("Login successful.");
-    },
-    onError: (error) => {
-      toast.error(getLoginErrorMessage(error));
+    onSuccess: async ({ user, tokens }) => {
+      await login(user, tokens.accessToken, tokens.refreshToken);
     },
   });
 

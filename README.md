@@ -1,10 +1,10 @@
 # Next.js + shadcn boilerplate
 
-Opinionated starter using the Next.js App Router, shadcn/ui primitives, React Query, and a demo auth flow with persistent sessions.
+A minimal starter using the Next.js App Router, shadcn/ui primitives, React Query, and an API-backed login with persistent sessions.
 
 ## Stack
 
-- Next.js 15 (App Router) with React 19 and TypeScript
+- Next.js 16.4.6 (App Router) with React 19 and TypeScript
 - Tailwind CSS 4 (`@tailwindcss/postcss`) with `tw-animate-css`
 - shadcn/ui (New York style) with `class-variance-authority` and `tailwind-merge`
 - React Query (`@tanstack/react-query`) for data fetching/caching
@@ -14,7 +14,7 @@ Opinionated starter using the Next.js App Router, shadcn/ui primitives, React Qu
 
 ## Architecture
 
-- `src/app` – App Router entries. `auth` routes use `AuthLayout` to redirect authenticated users away; `(dashboard)` group uses `DashboardLayout` to guard access and redirect to login.
+- `src/app` – App Router entries with a simple login layout and a single dashboard page. The dashboard is accessible in both authentication states.
 - `src/store/index.tsx` – wraps the app with `QueryClientProvider` and `AuthProvider`.
 - `src/store/AuthProvider.tsx` – client-side auth state with encrypted localStorage persistence and login/logout helpers exposed through `useAuth`.
 - `src/lib/api-client.ts` – shared Axios client that injects the stored token and normalizes request params.
@@ -24,10 +24,11 @@ Opinionated starter using the Next.js App Router, shadcn/ui primitives, React Qu
 
 ## Implemented features
 
-- Email/password login powered by React Hook Form + Zod, using React Query mutation to simulate an API call before storing a token/user in localStorage.
-- Signup page that provisions a demo token, persists the session, and redirects into the dashboard.
-- Protected dashboard that reads the stored user, shows basic session info, and supports logout.
-- Gradient-backed auth and dashboard screens styled with Tailwind CSS 4 and Geist fonts.
+- Email/password login powered by React Hook Form + Zod and a React Query mutation that calls `POST /auth/login` on the configured API.
+- The login response supplies `content.user` and `content.tokens.accessToken`, with an optional `content.tokens.refreshToken`.
+- The dashboard shows “User logged in” or “User logged out”, with a logout button or login link.
+- Sessions persist across reloads using the generic `app-auth` storage key. Login accepts any authenticated user without an admin role requirement.
+- Minimal, unbranded screens styled with Tailwind CSS 4 and Geist fonts.
 
 ## Ready-made components
 
@@ -42,7 +43,7 @@ Opinionated starter using the Next.js App Router, shadcn/ui primitives, React Qu
 Set these in `.env` (or pass them at runtime):
 
 - `NEXT_PUBLIC_API_BASE_URL` – base URL for the Axios client.
-- `NEXT_PUBLIC_ENCRYPTION_KEY` – key used by `LocalStore` to encrypt auth data (defaults to `xanadu-lms-encryption-key` for local development).
+- `NEXT_PUBLIC_ENCRYPTION_KEY` – key used by `LocalStore` to encode auth data (defaults to `app-local-storage-key` for local development).
 
 ## Getting started (local)
 

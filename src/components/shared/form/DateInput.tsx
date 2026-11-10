@@ -6,9 +6,8 @@ import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { Calendar } from "@/components/ui/calendar";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
-import { Input } from "@/components/ui/input.tsx";
-import { Label } from "@/components/ui/label.tsx";
-import { Scalars } from "@/types/global.types";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 import {
   Select,
   SelectContent,
@@ -17,16 +16,17 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 
-interface DateInputProps extends React.ComponentPropsWithRef<typeof Input> {
+interface DateInputProps extends Omit<
+  React.ComponentPropsWithRef<typeof Input>,
+  "value" | "onChange"
+> {
   label: string;
   error?: string;
   placeholder?: string;
-  value?: Scalars;
-  onChange?: (value: Scalars) => void;
+  value?: Date;
+  onChange?: (value: Date | undefined) => void;
   className?: string;
   selectTime?: boolean;
-
-  [key: string]: Scalars;
 }
 
 export function DateInput(props: DateInputProps) {

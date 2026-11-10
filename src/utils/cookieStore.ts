@@ -1,4 +1,4 @@
-import { deleteCookie, getCookie, getCookies, setCookie } from "cookies-next";
+import { deleteCookie, getCookie, getCookies, setCookie } from "cookies-next/client";
 
 type SameSite = "lax" | "strict" | "none";
 
@@ -32,8 +32,7 @@ export class CookieStore {
     try {
       const stored = getCookie(key);
       if (!stored) return null;
-      const stringValue = typeof stored === "string" ? stored : stored.toString();
-      return JSON.parse(stringValue) as T;
+      return JSON.parse(stored) as T;
     } catch (error) {
       console.error("Error getting cookie item:", error);
       return null;
@@ -51,7 +50,7 @@ export class CookieStore {
 
   static clearItems(prefix?: string): void {
     try {
-      const cookies = getCookies();
+      const cookies = getCookies() ?? {};
       Object.keys(cookies).forEach((name) => {
         if (!prefix || name.startsWith(prefix)) deleteCookie(name);
       });

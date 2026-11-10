@@ -2,8 +2,8 @@ import axios, { AxiosInstance, type AxiosRequestHeaders } from "axios";
 import { env } from "@/utils/env";
 import { CookieStore } from "@/utils/cookieStore";
 import { LocalStore } from "@/utils/localStore";
+import { AUTH_TOKEN_KEY } from "@/lib/auth";
 
-const AUTH_STORE_KEY = "metropay-admin-auth";
 const UNAUTHORIZED_MESSAGE = "Invalid or expired token.";
 const UNAUTHORIZED_ERROR = "Unauthorized";
 const LOGIN_ROUTE = "/auth/login";
@@ -47,7 +47,7 @@ class ApiClient {
     });
 
     this.client.interceptors.request.use((config) => {
-      const token = LocalStore.getItem<{ token?: string }>(AUTH_STORE_KEY)?.token;
+      const token = LocalStore.getItem<{ token?: string }>(AUTH_TOKEN_KEY)?.token;
       if (token) {
         const existingHeaders = (config.headers || {}) as AxiosRequestHeaders;
         config.headers = {
@@ -76,8 +76,8 @@ class ApiClient {
   private handleUnauthorized() {
     if (typeof window === "undefined") return;
 
-    LocalStore.removeItem(AUTH_STORE_KEY);
-    CookieStore.removeItem(AUTH_STORE_KEY);
+    LocalStore.removeItem(AUTH_TOKEN_KEY);
+    CookieStore.removeItem(AUTH_TOKEN_KEY);
 
     if (window.location.pathname === LOGIN_ROUTE) return;
     if (ApiClient.isHandlingUnauthorized) return;
